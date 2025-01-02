@@ -3,60 +3,84 @@
 
 /* buttonタグのリセットCSS（不要な場合、セレクタごと削除してください） */
 button {
-	padding: 0;
-	/* ボタンの内側の余白を設定 */
-	font-family: inherit;
-	/* 親要素からフォントファミリーを継承 */
-	appearance: none;
-	/* ボタンのデフォルトの外観（ブラウザによるスタイル）をリセット */
-	cursor: pointer;
-	/* ボタン上にカーソルを置くとポインター表示にする */
-	background-color: transparent;
-	/* ボタンの背景色を透明にする */
-	border: none;
-	/* ボタンのデフォルトの枠線を削除 */
+  padding: 0;
+  /* ボタンの内側の余白を設定 */
+  font-family: inherit;
+  /* 親要素からフォントファミリーを継承 */
+  appearance: none;
+  /* ボタンのデフォルトの外観（ブラウザによるスタイル）をリセット */
+  cursor: pointer;
+  /* ボタン上にカーソルを置くとポインター表示にする */
+  background-color: transparent;
+  /* ボタンの背景色を透明にする */
+  border: none;
+  /* ボタンのデフォルトの枠線を削除 */
 }
 
 /* ボタンのスタイル */
 .buttonRound {
-	display: flex;
-	/* フレックスボックスレイアウトを適用 */
-	align-items: center;
-	/* ボタン内の内容を垂直方向に中央に配置 */
-	justify-content: center;
-	/* ボタン内の内容を水平方向に中央に配置 */
-	/*  width: 100%; /* ボタンの幅を親要素の幅に合わせる */
-	/*  max-width: 320px; /* ボタンの最大幅を320pxに制限 */
-	height: 64px;
-	/* ボタンの高さを64pxに設定 */
-	padding: 8px 24px;
-	/* ボタンの上下に8px、左右に24pxの余白を設定 */
-	font-family: sans-serif;
-	/* フォントファミリーをサンセリフ系に設定 */
-	font-size: 16px;
-	/* フォントサイズを16pxに設定 */
-	color: #FFF;
-	/* 文字色を白に設定 */
-	text-align: center;
-	/* テキストを中央に配置 */
-	overflow-wrap: anywhere;
-	/* テキストが折り返しできるように設定 */
-	background-color: #6fa24a;
-	/* ボタンの背景色を緑に設定 */
-	border-radius: 32px;
-	/* ボタンの角を丸くする（高さの半分に相当） */
-	margin-bottom: 10px;
-	/* ボタン同士の間に10pxの間隔を作る */
+  display: flex;
+  /* フレックスボックスレイアウトを適用 */
+  align-items: center;
+  /* ボタン内の内容を垂直方向に中央に配置 */
+  justify-content: center;
+  /* ボタン内の内容を水平方向に中央に配置 */
+  width: 100%;
+  /* ボタンの幅を親要素の幅に合わせる */
+  max-width: 320px;
+  /* ボタンの最大幅を320pxに制限 */
+  height: 64px;
+  /* ボタンの高さを64pxに設定 */
+  padding: 8px 24px;
+  /* ボタンの上下に8px、左右に24pxの余白を設定 */
+  font-family: sans-serif;
+  /* フォントファミリーをサンセリフ系に設定 */
+  font-size: 16px;
+  /* フォントサイズを16pxに設定 */
+  color: #fff;
+  /* 文字色を白に設定 */
+  text-align: center;
+  /* テキストを中央に配置 */
+  overflow-wrap: anywhere;
+  /* テキストが折り返しできるように設定 */
+  background-color: #6fa24a;
+  /* ボタンの背景色を緑に設定 */
+  border-radius: 32px;
+  /* ボタンの角を丸くする（高さの半分に相当） */
+  margin-bottom: 10px;
+  /* ボタン同士の間に10pxの間隔を作る */
 }
 
-@media (any-hover: hover) {
-	.buttonRound {
-		transition: background-color 0.2s;
-		/* 背景色の変化に0.2秒の遷移を追加 */
-	}
+.radio-group {
+	display: flex; /* 子要素を横並びに */
+	align-items: center; /* 縦中央揃え */
+	gap: 10px; /* 子要素間の余白 */
+	border: none; /* fieldsetのデフォルトボーダーを非表示 */
+	padding: 0; /* 不要な余白を削除 */
+	margin: 0; /* マージンをリセット */
+  }
+  
+  .radio-group legend {
+	margin: 0; /* デフォルト余白を削除 */
+	padding-right: 10px; /* legendとラジオボタン間のスペースを調整 */
+	white-space: nowrap; /* テキストを折り返さない */
+  }
+  
+  .radio-group label {
+	display: flex;
+	align-items: center; /* ラベル内の要素を縦中央揃え */
+	gap: 5px; /* ラジオボタンとテキスト間の余白 */
+  }
+  
 
-	.buttonRound:hover {
-		background-color: #54802f;
-		/* ボタンをホバーしたときの背景色を暗くする */
-	}
+@media (any-hover: hover) {
+  .buttonRound {
+    transition: background-color 0.2s;
+    /* 背景色の変化に0.2秒の遷移を追加 */
+  }
+
+  .buttonRound:hover {
+    background-color: #54802f;
+    /* ボタンをホバーしたときの背景色を暗くする */
+  }
 }
