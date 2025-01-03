@@ -6,63 +6,99 @@
     <title>収支登録</title>
     <meta name="description" content="収支を登録するための画面" />
     <link rel="stylesheet" href="style.css" />
+    <!-- Font AwesomeのCDN -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
-    <div class="container">
-      <h1>収支登録</h1>
+    <header>
+      <nav>
+        <!-- ハンバーガーメニューアイコン -->
+        <i class="fas fa-bars"></i>
+      </nav>
+    </header>
+    <main>
+      <div class="container">
+        <h1>収支登録</h1>
+        <!--日付選択プルダウン-->
+        <p>
+          <label for="start">登録年月日:</label>
+          <input
+            type="date"
+            id="start"
+            name="trip-start"
+            value="2023-01-01"
+            min="2023-01-01"
+            max="2028-12-31"
+          />
+        </p>
 
-      <!--日付選択プルダウン-->
-      <p>
-        <label for="start">登録年月日:</label>
-        <input
-          type="date"
-          id="start"
-          name="trip-start"
-          value="2023-01-01"
-          min="2023-01-01"
-          max="2028-12-31"
-        />
-      </p>
+        <!-- 収支選択ラジオボタン -->
+        <fieldset class="radio-group">
+          <label>収支:</label>
+          <label for="income">
+            <input type="radio" id="income" name="drone" value="income" /> 収入
+          </label>
+          <label for="expenditure">
+            <input
+              type="radio"
+              id="expenditure"
+              name="drone"
+              value="expenditure"
+            />
+            支出
+          </label>
+        </fieldset>
 
-      <!-- 収支選択ラジオボタン -->
-      <fieldset class="radio-group">
-        <label>収支:</label>
-        <label for="income">
-          <input type="radio" id="income" name="drone" value="income" /> 収入
-        </label>
-        <label for="expenditure">
-          <input type="radio" id="expenditure" name="drone" value="expenditure" /> 支出
-        </label>
-      </fieldset>
+        <!--カテゴリ選択プルダウン-->
+        <p>
+          <label for="category-select">カテゴリ:</label>
+          <select name="pets" id="category-select">
+            <option value="">--選択してください--</option>
+            <option value="syokuzi">食事</option>
+            <option value="nitiyouhin">日用品</option>
+            <option value="ihuku">衣服</option>
+            <option value="biyou">美容</option>
+            <option value="iryohi">医療費</option>
+            <option value="konetuhi">光熱費</option>
+          </select>
+        </p>
 
-      <!--カテゴリ選択プルダウン-->
-      <p>
-        <label for="category-select">カテゴリ:</label>
-        <select name="pets" id="category-select">
-          <option value="">--選択してください--</option>
-          <option value="syokuzi">食事</option>
-          <option value="nitiyouhin">日用品</option>
-          <option value="ihuku">衣服</option>
-          <option value="biyou">美容</option>
-          <option value="iryohi">医療費</option>
-          <option value="konetuhi">光熱費</option>
-        </select>
-      </p>
+        <!--金額入力テキストボックス-->
+        <p>
+          <label for="tentacles">金額:</label>
+          <input
+            type="number"
+            id="tentacles"
+            name="tentacles"
+            min="10"
+            max="10000000"
+          />円
+        </p>
 
-      <!--金額入力テキストボックス-->
-      <p>
-        <label for="tentacles">金額:</label> 　　　<input
-          type="number"
-          id="tentacles"
-          name="tentacles"
-          min="10"
-          max="10000000"
-        />円
-      </p>
+        <!--登録ボタン-->
+        <button class="buttonRound" type="button" id="registButton">
+          登録
+        </button>
+      </div>
+    </main>
 
-      <!--登録ボタン-->
-      <button class="buttonRound" type="button" id="registButton">登録</button>
-    </div>
+    <!-- footer -->
+    <footer>
+      <!--戻るボタン-->
+      <div>
+        <button
+          onclick="location.href='./index.html';"
+          class="buttonReturn"
+          type="button"
+          id="returnButton"
+        >
+          <i class="fa fa-chevron-left"></i> 戻る
+        </button>
+      </div>
+    </footer>
   </body>
 </html>
