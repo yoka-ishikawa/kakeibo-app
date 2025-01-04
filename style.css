@@ -105,7 +105,31 @@ button {
 	align-items: center; /* ラベル内の要素を縦中央揃え */
 	gap: 5px; /* ラジオボタンとテキスト間の余白 */
   }
-  
+
+  .inexpen {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .inecome {
+    border: 3px solid #F89174;
+    border-radius: 15px;
+  }
+
+  .expenditure {
+    border: 3px solid #F89174;
+    border-radius: 15px;
+  }
+
+  .income-expenditure {
+    border: 3px solid #F89174;
+    border-radius: 15px;
+  }
+
+  .buttongroup {
+    display: flex;
+  }
 
 @media (any-hover: hover) {
   .buttonRound {
