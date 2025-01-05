@@ -15,13 +15,13 @@ function setDateValues() {
   // YYYY形式（年）
   var select = document.getElementById("startyear");
 
-  for (var inputstartyear = year; inputstartyear >= year - 20; inputstartyear--) {
-    var option = document.createElement("option");
-    option.value = inputstartyear;
-    option.textContent = inputstartyear;
-    select.appendChild(option);
-  }
   if (select) {
+      for (var inputstartyear = year; inputstartyear >= year - 20; inputstartyear--) {
+        var option = document.createElement("option");
+        option.value = inputstartyear;
+        option.textContent = inputstartyear;
+        select.appendChild(option);
+      }
     // 初期値を今年に設定
     select.value = year;
   }
