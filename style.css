@@ -131,6 +131,15 @@ button {
     display: flex;
   }
 
+  .year-container {
+    display: inline-flex; /* 横並びにする */
+    align-items: center;  /* 垂直方向で中央揃え */
+  }
+  
+  .year-text {
+    margin-left: 5px; /* プルダウンと文字列の間にスペースを追加 */
+  }
+
 @media (any-hover: hover) {
   .buttonRound {
     transition: background-color 0.2s;

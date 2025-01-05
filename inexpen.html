@@ -23,22 +23,17 @@
     <main>
       <div class="container">
         <h1>収支登録</h1>
-        <!--日付選択プルダウン-->
+        <!-- 日付選択プルダウン -->
         <p>
-          <label for="start">登録年月日:</label>
-          <input
-            type="date"
-            id="start"
-            name="trip-start"
-            value="2025-01-01"
-          />
+          <label for="startdate">登録年月日:</label>
+          <input type="date" id="startdate" name="startdate" />
         </p>
 
         <!-- 収支選択ラジオボタン -->
         <fieldset class="radio-group">
           <label>収入:</label>
           <label for="income">
-            <input type="radio" id="income" name="drone" value="income" /> 収入
+            <input type="radio" id="income" name="drone" value="income" />収入
           </label>
           <label for="expenditure">
             <input
@@ -51,7 +46,7 @@
           </label>
         </fieldset>
 
-        <!--カテゴリ選択プルダウン-->
+        <!-- カテゴリ選択プルダウン -->
         <p>
           <label for="category-select">カテゴリ:</label>
           <select name="pets" id="category-select">
@@ -65,7 +60,7 @@
           </select>
         </p>
 
-        <!--金額入力テキストボックス-->
+        <!-- 金額入力テキストボックス -->
         <p>
           <label for="tentacles">金額:</label>
           <input
@@ -77,7 +72,7 @@
           />円
         </p>
 
-        <!--登録ボタン-->
+        <!-- 登録ボタン -->
         <button class="buttonRound" type="button" id="registButton">
           登録
         </button>
@@ -86,7 +81,7 @@
 
     <!-- footer -->
     <footer>
-      <!--戻るボタン-->
+      <!-- 戻るボタン -->
       <div>
         <button
           onclick="location.href='./index.html';"
@@ -98,5 +93,6 @@
         </button>
       </div>
     </footer>
+    <script src="script.js"></script>
   </body>
 </html>
