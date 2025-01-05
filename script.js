@@ -16,7 +16,7 @@ function setDateValues() {
   var select = document.getElementById("startyear");
 
   if (select) {
-      for (var inputstartyear = year; inputstartyear >= year - 20; inputstartyear--) {
+      for (var inputstartyear = year - 20; inputstartyear <= year; inputstartyear++) {
         var option = document.createElement("option");
         option.value = inputstartyear;
         option.textContent = inputstartyear;
