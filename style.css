@@ -18,7 +18,7 @@ button {
 }
 
 /* ボタンのスタイル */
-div a {
+a {
   display: flex;
   /* フレックスボックスレイアウトを適用 */
   align-items: center;
