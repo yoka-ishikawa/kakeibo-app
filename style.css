@@ -51,6 +51,39 @@ a {
   /* ボタン同士の間に10pxの間隔を作る */
 }
 
+/* 収支登録フォーム内のボタンのスタイル */
+.buttonRound {
+  display: flex;
+  /* フレックスボックスレイアウトを適用 */
+  align-items: center;
+  /* ボタン内の内容を垂直方向に中央に配置 */
+  justify-content: center;
+  /* ボタン内の内容を水平方向に中央に配置 */
+  width: 100%;
+  /* ボタンの幅を親要素の幅に合わせる */
+  max-width: 320px;
+  /* ボタンの最大幅を320pxに制限 */
+  height: 64px;
+  /* ボタンの高さを64pxに設定 */
+  padding: 8px 24px;
+  /* ボタンの上下に8px、左右に24pxの余白を設定 */
+  font-family: sans-serif;
+  /* フォントファミリーをサンセリフ系に設定 */
+  font-size: 16px;
+  /* フォントサイズを16pxに設定 */
+  color: #fff;
+  /* 文字色を白に設定 */
+  text-align: center;
+  /* テキストを中央に配置 */
+  overflow-wrap: anywhere;
+  /* テキストが折り返しできるように設定 */
+  background-color: #6fa24a;
+  /* ボタンの背景色を緑に設定 */
+  border-radius: 32px;
+  /* ボタンの角を丸くする（高さの半分に相当） */
+  margin-bottom: 10px;
+  /* ボタン同士の間に10pxの間隔を作る */
+}
 /* フッター部のボタンのスタイル */
 .buttonReturn {
   display: flex;
@@ -86,59 +119,88 @@ a {
 }
 
 .radio-group {
-	display: flex; /* 子要素を横並びに */
-	align-items: center; /* 縦中央揃え */
-	gap: 10px; /* 子要素間の余白 */
-	border: none; /* fieldsetのデフォルトボーダーを非表示 */
-	padding: 0; /* 不要な余白を削除 */
-	margin: 0; /* マージンをリセット */
-  }
-  
-  .radio-group legend {
-	margin: 0; /* デフォルト余白を削除 */
-	padding-right: 10px; /* legendとラジオボタン間のスペースを調整 */
-	white-space: nowrap; /* テキストを折り返さない */
-  }
-  
-  .radio-group label {
-	display: flex;
-	align-items: center; /* ラベル内の要素を縦中央揃え */
-	gap: 5px; /* ラジオボタンとテキスト間の余白 */
-  }
+  display: flex; /* 子要素を横並びに */
+  align-items: center; /* 縦中央揃え */
+  gap: 10px; /* 子要素間の余白 */
+  border: none; /* fieldsetのデフォルトボーダーを非表示 */
+  padding: 0; /* 不要な余白を削除 */
+  margin: 0; /* マージンをリセット */
+}
 
-  .inexpen {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+.radio-group legend {
+  margin: 0; /* デフォルト余白を削除 */
+  padding-right: 10px; /* legendとラジオボタン間のスペースを調整 */
+  white-space: nowrap; /* テキストを折り返さない */
+}
 
-  .inecome {
-    border: 3px solid #F89174;
-    border-radius: 15px;
-  }
+.radio-group label {
+  display: flex;
+  align-items: center; /* ラベル内の要素を縦中央揃え */
+  gap: 5px; /* ラジオボタンとテキスト間の余白 */
+}
 
-  .expenditure {
-    border: 3px solid #F89174;
-    border-radius: 15px;
-  }
+.inexpen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
 
-  .income-expenditure {
-    border: 3px solid #F89174;
-    border-radius: 15px;
-  }
+.inecome {
+  border: 3px solid #f89174;
+  border-radius: 15px;
+}
 
-  .buttongroup {
-    display: flex;
-  }
+.expenditure {
+  border: 3px solid #f89174;
+  border-radius: 15px;
+}
 
-  .year-container {
-    display: inline-flex; /* 横並びにする */
-    align-items: center;  /* 垂直方向で中央揃え */
-  }
-  
-  .year-text {
-    margin-left: 5px; /* プルダウンと文字列の間にスペースを追加 */
-  }
+.income-expenditure {
+  border: 3px solid #f89174;
+  border-radius: 15px;
+}
+
+.buttongroup {
+  display: flex;
+}
+
+.year-container {
+  display: inline-flex; /* 横並びにする */
+  align-items: center; /* 垂直方向で中央揃え */
+}
+
+.year-text {
+  margin-left: 5px; /* プルダウンと文字列の間にスペースを追加 */
+}
+
+ul {
+  list-style: none; /* 丸ポチも画像も非表示 */
+  padding-left: 0; /* インデントを削除 */
+}
+
+/* 一覧表示のテーブルのスタイル */
+table {
+  width: 100%; /* テーブルの幅を100%に設定 */
+  border-collapse: collapse; /* セルの間隔をなくす */
+  margin-top: 20px; /* テーブルの上に20pxのマージンを追加 */
+}
+
+/* テーブルのセルのスタイル */
+th,
+td {
+  border: 1px solid #ddd; /* セルの枠線を1pxの灰色に設定 */
+  padding: 8px; /* セルの内側に8pxのパディングを追加 */
+  text-align: left; /* セルのテキストを左寄せにする */
+}
+
+/* テーブルのヘッダーのスタイル */
+th {
+  background-color: #f4f4f4; /* ヘッダーの背景色を灰色に設定 */
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9; /* 偶数行の背景色を灰色に設定 */
+}
 
 @media (any-hover: hover) {
   .buttonRound {

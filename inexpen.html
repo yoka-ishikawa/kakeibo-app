@@ -23,59 +23,75 @@
     <main>
       <div class="container">
         <h1>収支登録</h1>
-        <!-- 日付選択プルダウン -->
-        <p>
-          <label for="startdate">登録年月日:</label>
-          <input type="date" id="startdate" name="startdate" />
-        </p>
 
-        <!-- 収支選択ラジオボタン -->
-        <fieldset class="radio-group">
-          <label>収入:</label>
-          <label for="income">
-            <input type="radio" id="income" name="drone" value="income" />収入
-          </label>
-          <label for="expenditure">
+        <form id="expenseForm">
+          <!-- 日付選択プルダウン -->
+          <p>
+            <label for="date">登録年月日:</label>
+            <input type="date" id="date" name="date" required />
+          </p>
+
+          <!-- 収支選択ラジオボタン -->
+          <fieldset class="radio-group">
+            <label>収支:</label>
+            <!-- prettier-ignore -->
+            <label for="income">
+              <input type="radio"
+                id="income"
+                name="type"
+                value="income"
+                required
+              />
+              収入
+            </label>
+            <label for="expenditure">
+              <input
+                type="radio"
+                id="expenditure"
+                name="type"
+                value="expenditure"
+              />
+              支出
+            </label>
+          </fieldset>
+
+          <!-- カテゴリ選択プルダウン -->
+          <p>
+            <label for="category">カテゴリ:</label>
+            <select name="category" id="category" required>
+              <option value="">--選択してください--</option>
+              <option value="food">食事</option>
+              <option value="daily">日用品</option>
+              <option value="clothes">衣服</option>
+              <option value="beauty">美容</option>
+              <option value="medical">医療費</option>
+              <option value="utility">光熱費</option>
+            </select>
+          </p>
+
+          <!-- 金額入力テキストボックス -->
+          <p>
+            <label for="amount">金額:</label>
             <input
-              type="radio"
-              id="expenditure"
-              name="drone"
-              value="expenditure"
-            />
-            支出
-          </label>
-        </fieldset>
+              type="number"
+              id="amount"
+              name="amount"
+              min="10"
+              max="10000000"
+              required
+            />円
+          </p>
+          <!-- 登録ボタン -->
+          <button class="buttonRound" type="submit" id="registButton">
+            登録
+          </button>
+        </form>
 
-        <!-- カテゴリ選択プルダウン -->
-        <p>
-          <label for="category-select">カテゴリ:</label>
-          <select name="pets" id="category-select">
-            <option value="">--選択してください--</option>
-            <option value="syokuzi">食事</option>
-            <option value="nitiyouhin">日用品</option>
-            <option value="ihuku">衣服</option>
-            <option value="biyou">美容</option>
-            <option value="iryohi">医療費</option>
-            <option value="konetuhi">光熱費</option>
-          </select>
-        </p>
-
-        <!-- 金額入力テキストボックス -->
-        <p>
-          <label for="tentacles">金額:</label>
-          <input
-            type="number"
-            id="tentacles"
-            name="tentacles"
-            min="10"
-            max="10000000"
-          />円
-        </p>
-
-        <!-- 登録ボタン -->
-        <button class="buttonRound" type="button" id="registButton">
-          登録
-        </button>
+        <!-- 登録内容を表示するための要素を追加 -->
+        <div id="expenseList">
+          <h3>登録内容一覧</h3>
+          <ul id="expenses"></ul>
+        </div>
       </div>
     </main>
 
@@ -93,6 +109,6 @@
         </button>
       </div>
     </footer>
-    <script src="script.js"></script>
+    <script src="inexpen.js"></script>
   </body>
 </html>
