@@ -40,6 +40,7 @@
                 id="income"
                 name="type"
                 value="income"
+                onclick="updateDropdown(this.value)"
                 required
               />
               収入
@@ -50,6 +51,7 @@
                 id="expenditure"
                 name="type"
                 value="expenditure"
+                onclick="updateDropdown(this.value)"
               />
               支出
             </label>
@@ -59,13 +61,7 @@
           <p>
             <label for="category">カテゴリ:</label>
             <select name="category" id="category" required>
-              <option value="">--選択してください--</option>
-              <option value="food">食事</option>
-              <option value="daily">日用品</option>
-              <option value="clothes">衣服</option>
-              <option value="beauty">美容</option>
-              <option value="medical">医療費</option>
-              <option value="utility">光熱費</option>
+              <!-- inexpen.jsでカテゴリを更新する関数を呼び出す -->
             </select>
           </p>
 

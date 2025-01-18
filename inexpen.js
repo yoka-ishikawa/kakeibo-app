@@ -1,4 +1,4 @@
-// DOMが完全に読み込まれた後に年月と年月日の初期値を設定
+// DOMが完全に読み込まれた後に年月日の初期値を設定
 document.addEventListener("DOMContentLoaded", function () {
     setDateValues();
   });
@@ -12,41 +12,48 @@ document.addEventListener("DOMContentLoaded", function () {
     var month = String(now.getMonth() + 1).padStart(2, "0");
     var day = String(now.getDate()).padStart(2, "0");
   
-    // YYYY形式（年）
-    var select = document.getElementById("startyear");
-  
-    if (select) {
-        for (var inputstartyear = year - 20; inputstartyear <= year; inputstartyear++) {
-          var option = document.createElement("option");
-          option.value = inputstartyear;
-          option.textContent = inputstartyear;
-          select.appendChild(option);
-        }
-      // 初期値を今年に設定
-      select.value = year;
-    }
-  
-    // YYYY-MM形式（年月）
-    const inputstartmonth = document.getElementById("startmonth");
-    if (inputstartmonth) {
-      var startmonth = `${year}-${month}`;
-      inputstartmonth.value = startmonth;
-    }
-  
     // YYYY-MM-DD形式（年月日）
-    const inputstartdate = document.getElementById("startdate");
+    const inputstartdate = document.getElementById("date");
     if (inputstartdate) {
-      var startdate = `${year}-${month}-${day}`;
-      inputstartdate.value = startdate;
+      var date = `${year}-${month}-${day}`;
+      inputstartdate.value = date;
     }
   }
 
+  // プルダウンの選択肢データ
+const options = {
+  income: ["選択してください",  "給料", "おこづかい", "賞与", "臨時収入", "その他"],
+  expenditure: ["選択してください", "食事", "日用品", "衣服", "美容", "医療費", "光熱費", "住居費", "通信費", "その他"]
+};
+
+// プルダウンリストを更新する関数
+function updateDropdown(selectedValue) {
+  const dropdown = document.getElementById("category");
+
+  // プルダウンの中身をクリア
+  dropdown.innerHTML = "";
+
+  // 選択された値に応じたオプションを追加
+  options[selectedValue].forEach(item => {
+    const option = document.createElement("option");
+    option.value = item;
+    option.textContent = item;
+    dropdown.appendChild(option);
+  });
+}
+
+// 初期化
+document.addEventListener("DOMContentLoaded", () => {
+  updateDropdown("income"); // デフォルトは"収入"
+});
+
+// フォームの内容を取得
 document
   .getElementById("expenseForm")
   .addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const startdate = document.getElementById("date").value; // 開始日
+    const date = document.getElementById("date").value; // 開始日
     const selectedOption = document.querySelector('input[name="type"]:checked'); // 収入か支出か
     const incomeOrExpenditure = selectedOption
     ? selectedOption.value === "income"
@@ -60,15 +67,14 @@ document
     // 画面に表示
     const expensesList = document.getElementById("expenses");
     const listItem = document.createElement("li");
-    listItem.textContent = `${startdate} ${incomeOrExpenditure} ${category} ${amount}円`;
+    listItem.textContent = `${date} ${incomeOrExpenditure} ${category} ${amount}円`;
     expensesList.appendChild(listItem);
 
-/*     // フォームをクリア
-    document.getElementById("startdate").value = "";
-    document.getElementById("income").value = "";
-    document.getElementById("expenditure").value = "";
-    document.getElementById("category-select").value = "";
-    document.getElementById("tentacles").value = ""; */
+    // フォームをクリア
+    setDateValues(); // 日付を今日の日付にリセット
+    document.querySelector('input[name="type"]:checked').checked = false; // ラジオボタンの選択解除
+    document.getElementById("category").value = ""; // カテゴリを未選択に
+    document.getElementById("amount").value = ""; // 金額をクリア
 
     /*   // データベースに登録
   try {
@@ -92,13 +98,7 @@ document
       const listItem = document.createElement('li');
       listItem.textContent = `${startdate} ${income} ${expenditure} ${category} ${tentacles}円`;
       expensesList.appendChild(listItem);
-      
-      // フォームをクリア
-      document.getElementById('startdate').value = '';
-      document.getElementById('income').value = '';
-      document.getElementById('expenditure').value = '';
-      document.getElementById('category-select').value = '';
-      document.getElementById('tentacles').value = '';
+  
     }
   } catch (error) {
     console.error('登録エラー:', error);
