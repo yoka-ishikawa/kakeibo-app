@@ -217,10 +217,6 @@ footer {
   border-radius: 15px;
 }
 
-.buttongroup {
-  display: flex;
-}
-
 .year-container {
   display: inline-flex; /* 横並びにする */
   align-items: center; /* 垂直方向で中央揃え */
@@ -276,20 +272,77 @@ tr:nth-child(even) {
   .menucontainer {
     grid-template-columns: 1fr;  /* 1列に設定（スマホの場合） */
     width: 100%;  /* スマホでは幅を100%に設定 */
+    padding: 10px;  /* 内側の余白を調整 */
   }
-  
+
   a {
-    width: 100%;  /* ボタンを横幅いっぱいに設定 */
+    display: block;  /* aタグをブロック要素に変更して幅を取らせる */
+    width: 100%;  /* 幅を100%に設定 */
+    text-align: center;  /* テキストを中央揃え */
+    padding: 10px 0;  /* 上下にパディングを追加 */
+    box-sizing: border-box;  /* 幅にパディングを含める */
   }
 
   .container {
     width: 100%;  /* スマホの場合、幅を100%に設定 */
-    padding: 20px;  /* パディングを調整 */
+    padding: 10px;  /* パディングを調整 */
   }
 
   form {
     width: 100%;  /* フォームの幅を親要素の幅に合わせる */
     padding: 20px;  /* フォーム内のパディングを調整 */
     max-width: none;  /* 最大幅制限を削除 */
+    box-sizing: border-box;  /* 幅にパディングを含める */
+  }
+
+  form p {
+    flex-direction: row;  /* 横並び */
+    align-items: center;  /* 項目名と入力フィールドを垂直方向に中央揃え */
+    width: 100%;  /* 親要素に合わせて幅を100%に設定 */
+    margin-bottom: 15px;  /* 各項目間に間隔をつける */
+  }
+
+  form p label {
+    margin-right: 10px;  /* 項目名と入力フィールドの間にスペース */
+    min-width: 100px;  /* 項目名の幅を固定 */
+    text-align: right;  /* 項目名を右寄せ */
+    padding-right: 10px; /* 右側に余白 */
+  }
+
+  input[type="date"],
+  input[type="number"],
+  select {
+    width: 100%;  /* 入力フォームの幅を親要素に合わせる */
+    max-width: none;  /* 最大幅制限を削除 */
+    height: 36px;  /* 高さを調整 */
+    padding: 8px;  /* 内側の余白 */
+  }
+
+  button {
+    width: 100%;  /* ボタンの幅を親要素に合わせる */
+    max-width: none;  /* 最大幅制限を削除 */
+  }
+
+  /* 収支登録画面のボタン */
+  .buttonRound {
+    width: 100%;  /* ボタンの幅を100%に設定 */
+    max-width: none;  /* 最大幅制限を削除 */
+    padding: 12px 24px;  /* パディングを調整 */
+  }
+
+  .buttonReturn {
+    width: 100%;  /* 戻るボタンの幅を100%に設定 */
+    max-width: none;  /* 最大幅制限を削除 */
+    padding: 12px 24px;  /* パディングを調整 */
+  }
+
+  footer {
+    width: 100%;  /* フッター内のボタンの幅を100%に設定 */
+    padding: 10px 0;  /* 上下のパディングを調整 */
+  }
+
+  .bottonGroup {
+    flex-direction: row;  /* ボタンを縦並びに変更 */
+    gap: 15px;  /* ボタン間の間隔を広げる */
   }
 }
