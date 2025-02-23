@@ -1,54 +1,116 @@
 @charset "UTF-8";
 /* 文字エンコーディングを指定 */
 
-/* buttonタグのリセットCSS（不要な場合、セレクタごと削除してください） */
-button {
-  padding: 0;
-  /* ボタンの内側の余白を設定 */
-  font-family: inherit;
-  /* 親要素からフォントファミリーを継承 */
-  appearance: none;
-  /* ボタンのデフォルトの外観（ブラウザによるスタイル）をリセット */
-  cursor: pointer;
-  /* ボタン上にカーソルを置くとポインター表示にする */
-  background-color: transparent;
-  /* ボタンの背景色を透明にする */
-  border: none;
-  /* ボタンのデフォルトの枠線を削除 */
+/* メニューコンテナ */
+.menucontainer {
+  display: grid;  /* Gridレイアウト */
+  grid-template-columns: repeat(2, 1fr);  /* 2列に設定 */
+  grid-gap: 20px;  /* ボタン間の隙間を広げる */
+  width: 80%;  /* コンテナの幅を画面の80%に設定 */
+  margin: 0 auto;  /* 中央揃え */
+}
+
+/* メニューアイテム */
+.menuButton {
+  display: flex;                     /* フレックスボックスレイアウト */
+  align-items: center;               /* アイテム内の要素を中央揃え */
+  justify-content: center;           /* アイテム内の要素を中央揃え */
+  height: 64px;                      /* 高さを64pxに設定 */
+  padding: 8px 32px;                 /* 内側の余白を調整 */
+  font-family: sans-serif;           /* フォントファミリーをサンセリフ系に設定 */
+  font-size: 16px;                   /* フォントサイズを16pxに設定 */
+  color: #fff;                     /* 文字色を白に設定 */
+  text-align: center;                /* テキストを中央に配置 */
+  background-color: #6fa24a;       /* ボタンの背景色を緑に設定 */
+  border-radius: 32px;               /* ボタンの角を丸くする */
+  margin-bottom: 20px;               /* ボタン同士の間に20pxの間隔 */
+  box-sizing: border-box;            /* 幅に余白を含める */
+}
+
+/* containerをflexboxで中央に配置 */
+.container {
+  display: flex;
+  justify-content: center;  /* 水平方向の中央揃え */
+  align-items: center;      /* 垂直方向の中央揃え */
+  width: 80%;               /* コンテナの幅を画面の80%に設定 */
+  margin: 0 auto;           /* 中央揃え */
+  padding: 20px;            /* 内側の余白 */
+  background-color: #f4f4f4; /* 背景色 */
+  border-radius: 10px;      /* 角を丸くする */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 少し影をつける */
+  max-width: 600px;         /* 最大幅を600pxに制限 */
+}
+
+/* formの中央揃え */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* フォーム内の項目を中央揃え */
+  justify-content: center;
+  width: auto;  /* 親要素の幅に合わせる */
+  max-width: 600px;  /* 最大幅を600pxに制限 */
+  padding: 60px;  /* 内側の余白 */
+  background-color: #fff;  /* 背景色 */
+  border-radius: 10px;  /* 角を丸くする */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 少し影をつける */
+}
+
+/* 各項目を横並びに */
+form p {
+  display: flex;
+  flex-direction: row; /* 横並びに設定 */
+  align-items: center; /* 項目名と入力フィールドを縦方向に中央揃え */
+  width: 100%;  /* 親要素に合わせる */
+  margin-bottom: 15px;  /* 各項目間に間隔をつける */
+}
+
+/* 項目名のスタイル */
+form p label {
+  margin-right: 10px;  /* 項目名と入力フィールドの間にスペース */
+  min-width: 100px;  /* 項目名の幅を固定 */
+  text-align: right;  /* 項目名を右寄せ */
+  padding-right: 10px; /* 右側に余白 */
+}
+
+/* 収支のラジオボタンのスタイル */
+.radio-group {
+  display: flex;  /* 横並びにする */
+  align-items: center;  /* ラジオボタンとラベルを縦中央に揃える */
+  width: 100%;  /* 幅を親要素に合わせる */
+  margin-bottom: 15px;  /* 他の項目との間隔 */
+  border: none;  /* 枠線を表示しない */
+  padding: 0;  /* パディングをリセット */
+}
+
+/* 収支ラベルのスタイル */
+.radio-group label {
+  margin-right: 10px;  /* ラベルとラジオボタンの間にスペース */
+  min-width: 100px;  /* 項目名の幅を固定 */
+  text-align: right;  /* 項目名を右寄せ */
+  padding-right: 10px; /* 右側に余白 */
+  border: none;  /* 枠線を表示しない */
+}
+
+/* 入力フィールドのスタイル */
+input[type="date"],
+input[type="number"],
+select {
+  width: 100%;  /* 入力フォームの幅を親要素に合わせる */
+  max-width: 300px;  /* 最大幅を設定 */
+  padding: 8px;  /* 内側の余白 */
+  margin-top: 5px;  /* 上の要素との間隔 */
+  border-radius: 5px;  /* 角を丸く */
+  border: 1px solid #ccc;  /* 枠線を指定 */
+  height: 36px;  /* 高さを調整 */
 }
 
 /* ボタンのスタイル */
-a {
-  display: flex;
-  /* フレックスボックスレイアウトを適用 */
-  align-items: center;
-  /* ボタン内の内容を垂直方向に中央に配置 */
-  justify-content: center;
-  /* ボタン内の内容を水平方向に中央に配置 */
-  width: 100%;
-  /* ボタンの幅を親要素の幅に合わせる */
-  max-width: 320px;
-  /* ボタンの最大幅を320pxに制限 */
-  height: 64px;
-  /* ボタンの高さを64pxに設定 */
-  padding: 8px 24px;
-  /* ボタンの上下に8px、左右に24pxの余白を設定 */
-  font-family: sans-serif;
-  /* フォントファミリーをサンセリフ系に設定 */
-  font-size: 16px;
-  /* フォントサイズを16pxに設定 */
-  color: #fff;
-  /* 文字色を白に設定 */
-  text-align: center;
-  /* テキストを中央に配置 */
-  overflow-wrap: anywhere;
-  /* テキストが折り返しできるように設定 */
-  background-color: #6fa24a;
-  /* ボタンの背景色を緑に設定 */
-  border-radius: 32px;
-  /* ボタンの角を丸くする（高さの半分に相当） */
-  margin-bottom: 10px;
-  /* ボタン同士の間に10pxの間隔を作る */
+button {
+  width: 100%;  /* ボタンの幅を親要素に合わせる */
+  max-width: 300px;  /* 最大幅を設定 */
+  padding: 10px;  /* 内側の余白 */
+  margin-top: 15px;  /* 上の要素との間隔 */
+  border-radius: 5px;  /* 角を丸く */
 }
 
 /* 収支登録フォーム内のボタンのスタイル */
@@ -63,8 +125,8 @@ a {
   /* ボタンの幅を親要素の幅に合わせる */
   max-width: 320px;
   /* ボタンの最大幅を320pxに制限 */
-  height: 64px;
-  /* ボタンの高さを64pxに設定 */
+  height: 50px; 
+  /* 高さを50pxに設定 */
   padding: 8px 24px;
   /* ボタンの上下に8px、左右に24pxの余白を設定 */
   font-family: sans-serif;
@@ -84,7 +146,7 @@ a {
   margin-bottom: 10px;
   /* ボタン同士の間に10pxの間隔を作る */
 }
-/* フッター部のボタンのスタイル */
+/* フッター部の戻るボタンのスタイル */
 .buttonReturn {
   display: flex;
   /* フレックスボックスレイアウトを適用 */
@@ -92,51 +154,46 @@ a {
   /* ボタン内の内容を垂直方向に中央に配置 */
   justify-content: center;
   /* ボタン内の内容を水平方向に中央に配置 */
-  width: 100%;
+  width: auto;
   /* ボタンの幅を親要素の幅に合わせる */
   max-width: 320px;
   /* ボタンの最大幅を320pxに制限 */
-  height: 64px;
-  /* ボタンの高さを64pxに設定 */
-  padding: 8px 24px;
-  /* ボタンの上下に8px、左右に24pxの余白を設定 */
+  height: 50px; 
+  /* 高さを50pxに設定 */
+  padding: 8px 20px; 
+  /* 内側の余白を8px 20pxに設定 */
   font-family: sans-serif;
   /* フォントファミリーをサンセリフ系に設定 */
   font-size: 16px;
   /* フォントサイズを16pxに設定 */
-  color: #fff;
-  /* 文字色を白に設定 */
+  color: #2b2b2b;
+  /* 文字色を黒に設定 */
   text-align: center;
   /* テキストを中央に配置 */
-  overflow-wrap: anywhere;
-  /* テキストが折り返しできるように設定 */
-  background-color: #6fa24a;
-  /* ボタンの背景色を緑に設定 */
+  background-color: #fff; 
+  /* 背景色を白に設定 */
+  border: 2px solid #6fa24a; 
+  /* 枠線を緑に設定 */
   border-radius: 32px;
   /* ボタンの角を丸くする（高さの半分に相当） */
   margin-bottom: 10px;
   /* ボタン同士の間に10pxの間隔を作る */
+  white-space: nowrap; 
+  /* テキストの折り返しを防止 */
 }
 
-.radio-group {
-  display: flex; /* 子要素を横並びに */
-  align-items: center; /* 縦中央揃え */
-  gap: 10px; /* 子要素間の余白 */
-  border: none; /* fieldsetのデフォルトボーダーを非表示 */
-  padding: 0; /* 不要な余白を削除 */
-  margin: 0; /* マージンをリセット */
-}
-
-.radio-group legend {
-  margin: 0; /* デフォルト余白を削除 */
-  padding-right: 10px; /* legendとラジオボタン間のスペースを調整 */
-  white-space: nowrap; /* テキストを折り返さない */
-}
-
-.radio-group label {
+footer {
   display: flex;
-  align-items: center; /* ラベル内の要素を縦中央揃え */
-  gap: 5px; /* ラジオボタンとテキスト間の余白 */
+  justify-content: center;  /* ボタンを水平方向で中央揃え */
+  align-items: center;  /* ボタンを垂直方向で中央揃え */
+  width: auto;
+  padding: 20px;
+}
+
+.bottonGroup {
+  display: flex;
+  justify-content: center;  /* ボタンを中央に配置 */
+  gap: 20px;  /* ボタン間に20pxの間隔 */
 }
 
 .inexpen {
@@ -145,7 +202,7 @@ a {
   gap: 10px;
 }
 
-.inecome {
+.income {
   border: 3px solid #f89174;
   border-radius: 15px;
 }
@@ -211,5 +268,28 @@ tr:nth-child(even) {
   .buttonRound:hover {
     background-color: #54802f;
     /* ボタンをホバーしたときの背景色を暗くする */
+  }
+}
+
+/* スマホ用のスタイル（画面幅600px以下の場合） */
+@media screen and (max-width: 600px) {
+  .menucontainer {
+    grid-template-columns: 1fr;  /* 1列に設定（スマホの場合） */
+    width: 100%;  /* スマホでは幅を100%に設定 */
+  }
+  
+  a {
+    width: 100%;  /* ボタンを横幅いっぱいに設定 */
+  }
+
+  .container {
+    width: 100%;  /* スマホの場合、幅を100%に設定 */
+    padding: 20px;  /* パディングを調整 */
+  }
+
+  form {
+    width: 100%;  /* フォームの幅を親要素の幅に合わせる */
+    padding: 20px;  /* フォーム内のパディングを調整 */
+    max-width: none;  /* 最大幅制限を削除 */
   }
 }
