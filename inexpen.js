@@ -1,21 +1,20 @@
-// DOMが完全に読み込まれた後に年月日の初期値を設定
+// DOMが完全に読み込まれた後に初期値を設定
 document.addEventListener("DOMContentLoaded", function () {
-    setDateValues();
+    setDateValues(); // 年月日の初期値を設定
+    updateDropdown("income"); // デフォルトは"収入"
   });
   
   // 年月と年月日の初期値を設定する関数
   function setDateValues() {
-    var now = new Date();
-  
-    // 年、月、日を取得
-    var year = now.getFullYear();
-    var month = String(now.getMonth() + 1).padStart(2, "0");
-    var day = String(now.getDate()).padStart(2, "0");
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
   
     // YYYY-MM-DD形式（年月日）
     const inputstartdate = document.getElementById("date");
     if (inputstartdate) {
-      var date = `${year}-${month}-${day}`;
+      const date = `${year}-${month}-${day}`;
       inputstartdate.value = date;
     }
   }
@@ -29,9 +28,7 @@ const options = {
 // プルダウンリストを更新する関数
 function updateDropdown(selectedValue) {
   const dropdown = document.getElementById("category");
-
-  // プルダウンの中身をクリア
-  dropdown.innerHTML = "";
+  dropdown.innerHTML = ""; // プルダウンの中身をクリア
 
   // 選択された値に応じたオプションを追加
   options[selectedValue].forEach(item => {
@@ -41,11 +38,6 @@ function updateDropdown(selectedValue) {
     dropdown.appendChild(option);
   });
 }
-
-// 初期化
-document.addEventListener("DOMContentLoaded", () => {
-  updateDropdown("income"); // デフォルトは"収入"
-});
 
 // フォームの内容を取得
 document
