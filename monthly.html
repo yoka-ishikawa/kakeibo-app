@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>月間レポート</title>
-    <meta name="description" content="月間の収支を把握するための画面" />
+    <title>レポート</title>
+    <meta name="description" content="収支を把握するためのレポート画面" />
     <link rel="stylesheet" href="style.css" />
     <!-- Font AwesomeのCDN -->
     <link
@@ -15,11 +15,17 @@
 
   <body>
     <header>
-      <h1>月間レポート</h1>
+      <h1>レポート</h1>
     </header>
     <main>
       <div class="container">
-        <!--年月入力欄-->
+        <!--月間年間選択プルダウン-->
+        <select id="mySelect">
+          <option value="" disabled selected>選択してください</option>
+          <option value="monthly">月間</option>
+          <option value="yearly">年間</option>
+        </select>
+        <!--期間入力欄-->
         <input type="month" id="startmonth" name="startmonth" />
         <!--収支結果を表示する枠-->
         <div class="inexpen">
