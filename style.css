@@ -346,3 +346,108 @@ tr:nth-child(even) {
     gap: 15px;  /* ボタン間の間隔を広げる */
   }
 }
+
+/* ボタンの共通スタイル */
+#registButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  color: white;
+  background-color: gray; /* 最初は非活性なのでグレー */
+  cursor: not-allowed;    /* 押せないカーソル */
+}
+
+/* ボタンが活性化されたときのスタイル */
+#registButton.active {
+  background-color: #54802f;
+  cursor: pointer;
+}
+
+  /* TableReel コンテナ */
+  　div {
+    width: 100%;
+    overflow-x: auto; /* 横スクロールを可能にする */
+    margin-bottom: 20px; /* 下部に余白を追加 */
+  }
+  
+  /* テーブルの全体的なスタイル */
+  Table {
+    width: 100%;
+    border-collapse: collapse; /* セルの境界線を統一 */
+    font-size: 16px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 影で立体感を追加 */
+  }
+  
+  /* ヘッダーのスタイル */
+  thead {
+    background-color: #f4f4f4; /* ヘッダーの背景色 */
+    font-weight: bold;
+  }
+  
+  Th, Td {
+    padding: 12px 15px; /* セル内の余白 */
+    border: 1px solid #ddd; /* 枠線を追加 */
+    text-align: left; /* 左寄せ */
+  }
+  
+  Th {
+    background-color: #fff; /* ヘッダーの背景色 */
+    position: sticky;
+    top: 0; /* ヘッダーをスクロール時に固定 */
+    z-index: 2; /* ヘッダーが他の内容の上に来るように */
+  }
+  
+  /* 左寄せ・右寄せのカラムの固定 */
+  Th[fixed="left"], Td[fixed="left"] {
+    position: sticky;
+    left: 0;
+    background-color: #fff; /* 固定された列の背景色 */
+    z-index: 1;
+  }
+  
+  Th[fixed="right"], Td[fixed="right"] {
+    position: sticky;
+    right: 0;
+    background-color: #fff; /* 固定された列の背景色 */
+    z-index: 1;
+  }
+  
+  /* ボタン */
+  Button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+  
+  Button:hover {
+    background-color: #45a049; /* ホバー時の背景色 */
+  }
+  
+  /* ボタンの小さめスタイル */
+  Button[size="s"] {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  /* 操作ボタンセルの整列 */
+  Td[fixed="right"] {
+    text-align: center;  /* 中央揃え */
+    display: flex;
+    justify-content: center;  /* ボタンを中央揃え */
+    gap: 10px;  /* ボタンの間に10pxの間隔を追加 */
+  }
+  
+  /* テーブル内の各行の間隔 */
+  tbody tr {
+    background-color: #fff; /* 各行の背景色 */
+  }
+  
+  tbody tr:hover {
+    background-color: #f9f9f9; /* 行にカーソルを合わせたときの背景色 */
+  }

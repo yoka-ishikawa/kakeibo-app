@@ -34,7 +34,7 @@
               <input type="radio"
                 id="income"
                 name="type"
-                value="income"
+                value="income" checked
                 onclick="updateDropdown(this.value)"
                 required
               />
@@ -72,9 +72,11 @@
               required
             />円
           </p>
+          <!-- 登録ボタン -->
+          <button class="buttonRound" type="submit" id="registButton" disabled>
+            登録
+          </button>
         </form>
-        
-        <ul id="expenses"></ul>　<!--これは不要なので後で消す、代わりに登録しましたというポップアップを表示させるようにする-->
       </div>
     </main>
     
@@ -88,10 +90,6 @@
           type="button"
           >
           <i class="fa fa-chevron-left"></i> 戻る
-        </button>
-        <!-- 登録ボタン -->
-        <button class="buttonRound" type="submit" id="registButton">
-          登録
         </button>
       </div>
     </footer>

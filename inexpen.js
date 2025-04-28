@@ -1,8 +1,43 @@
 // DOMが完全に読み込まれた後に初期値を設定
+console.log("JavaScriptが読み込まれました！");
 document.addEventListener("DOMContentLoaded", function () {
   setDateValues(); // 年月日の初期値を設定
   updateDropdown("income"); // デフォルトは"収入"
+  setupButtonControl(); // 登録ボタンの制御を設定
 });
+
+// ボタンを制御する関数
+function setupButtonControl() {
+  const inputs = document.querySelectorAll('#category, #amount');
+  const button = document.getElementById("registButton");
+
+  function checkInputs() {
+    let allFilled = true;
+    inputs.forEach(input => {
+      if (input.value.trim() === '') {
+        allFilled = false;
+      }
+    });
+
+    console.log("ボタンの状態:", allFilled ? "有効" : "無効"); // ボタンの状態をログに出力
+
+    if (allFilled) {
+      button.disabled = false;
+      button.classList.add('active');
+    } else {
+      button.disabled = true;
+      button.classList.remove('active');
+    }
+  }
+
+  checkInputs();
+
+  // 入力・選択変更を監視
+  inputs.forEach(input => {
+    input.addEventListener('input', checkInputs);
+    input.addEventListener('change', checkInputs);
+  });
+}
 
 // 年月と年月日の初期値を設定する関数
 function setDateValues() {
@@ -51,55 +86,44 @@ function updateDropdown(selectedValue) {
 document.getElementById("expenseForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const date = document.getElementById("date").value; // 開始日
-  const selectedOption = document.querySelector('input[name="type"]:checked'); // 収入か支出か
-  const incomeOrExpenditure = selectedOption
-      ? selectedOption.value === "income"
-          ? "収入"
-          : "支出"
-      : null; // "収入" または "支出" を取得
+  console.log("ふぉーむが送信されました！");
 
-  const categorySelect = document.getElementById("category"); // カテゴリ
-  const category = categorySelect.options[categorySelect.selectedIndex].text; // カテゴリ
-  const amount = document.getElementById("amount").value; // 金額
+  // ユーザに確認メッセージを表示
+  const isConfirmed = confirm("登録してもよろしいですか？");
 
-  // 画面に表示
-  const expensesList = document.getElementById("expenses");
-  const listItem = document.createElement("li");
-  listItem.textContent = `${date} ${incomeOrExpenditure} ${category} ${amount}円`;
-  expensesList.appendChild(listItem);
+  console.log("confirm結果:", isConfirmed);  // 確認結果をログに出力
 
-  // フォームをクリア
-  setDateValues(); // 日付を今日の日付にリセット
-  document.querySelector('input[name="type"]:checked').checked = false; // ラジオボタンの選択解除
-  document.getElementById("category").value = ""; // カテゴリを未選択に
-  document.getElementById("amount").value = ""; // 金額をクリア
+  if (isConfirmed) {
+    // OKが押された場合、登録処理を実行
+    const date = document.getElementById("date").value; // 開始日
+    const selectedOption = document.querySelector('input[name="type"]:checked'); // 収入か支出か
+    const incomeOrExpenditure = selectedOption
+        ? selectedOption.value === "income"
+            ? "収入"
+            : "支出"
+        : null; // "収入" または "支出" を取得
 
-  /*  // データベースに登録（コメントアウト）
-  try {
-      const response = await fetch('/api/expenses', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              startdate: startdate, // 開始日
-              income: income, // 収入
-              expenditure: expenditure, // 支出
-              category: category, // カテゴリ
-              tentacles: tentacles // 金額
-          })
-      });
-      
-      if (response.ok) {
-          // 画面に表示
-          const expensesList = document.getElementById('expenses');
-          const listItem = document.createElement('li');
-          listItem.textContent = `${startdate} ${income} ${expenditure} ${category} ${tentacles}円`;
-          expensesList.appendChild(listItem);
-      }
-  } catch (error) {
-      console.error('登録エラー:', error);
-      alert('登録に失敗しました');
-  } */
+    const categorySelect = document.getElementById("category"); // カテゴリ
+    const category = categorySelect.options[categorySelect.selectedIndex].text; // カテゴリ
+    const amount = document.getElementById("amount").value; // 金額
+
+    // 画面に表示
+    //const expensesList = document.getElementById("expenses");
+    //const listItem = document.createElement("li");
+    //listItem.textContent = `${date} ${incomeOrExpenditure} ${category} ${amount}円`;
+    //expensesList.appendChild(listItem);
+
+    // フォームをクリア
+    setDateValues(); // 日付を今日の日付にリセット
+    document.getElementById("category").value = ""; // カテゴリを未選択に
+    document.getElementById("amount").value = ""; // 金額をクリア
+    setupButtonControl(); // 登録ボタンの制御を設定
+
+    // 登録完了ポップアップを表示
+    alert("登録が完了しました！");
+
+  } else {
+    // キャンセルが押された場合、何もしない
+    alert("登録がキャンセルされました");
+  }
 });

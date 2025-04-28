@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>収支登録</title>
+  <title>収支登録一覧</title>
   <link rel="stylesheet" href="style.css" />
   <!-- Font AwesomeのCDN -->
   <link
@@ -14,19 +14,36 @@
 <body>
   <h1>収支登録一覧</h1>
 
-  <table id="expenseTable">
-    <thead>
-      <tr>
-        <th>登録年月日</th>
-        <th>収支</th>
-        <th>カテゴリ</th>
-        <th>金額</th>
-      </tr>
-    </thead>
-    <tbody id="expenseList">
-      <!-- JSONから読み込んだデータがここに表示される -->
-    </tbody>
-  </table>
+  <div style="width: 100%;">
+    <TableReel>
+      <Table>
+        <thead>
+          <tr>
+            <Th fixed="left">登録年月日</Th>
+            <Th>収支</Th>
+            <Th>カテゴリ</Th>
+            <Th>金額</Th>
+            <Th fixed="right">
+              操作
+            </Th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <Td fixed="left">
+              2023-10-01</Td>
+            <Td>収入</Td>
+            <Td>給料</Td>
+            <Td>1000円</Td>
+            <Td fixed="right">
+            <Button size="s">編集</Button>
+            <Button size="s">削除</Button>
+            </Td>
+          </tr>
+        </tbody>
+      </Table>
+    </TableReel>
+  </div>
 </body>
 <!-- footer -->
 <footer>
