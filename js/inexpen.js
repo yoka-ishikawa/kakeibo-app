@@ -1,9 +1,43 @@
 // DOMが完全に読み込まれた後に初期値を設定
-console.log("JavaScriptが読み込まれました！");
 document.addEventListener("DOMContentLoaded", function () {
   setDateValues(); // 年月日の初期値を設定
   updateDropdown("income"); // デフォルトは"収入"
   setupButtonControl(); // 登録ボタンの制御を設定
+
+  // 収支登録一覧画面で編集ボタンを押したときの処理
+  const params = new URLSearchParams(window.location.search);
+
+  const date = params.get("date");
+  const type = params.get("type");
+  const category = params.get("category");
+  const amount = params.get("amount");
+
+  if(date) {
+    const dateInput = document.getElementById("date");
+    if (dateInput) dateInput.value = date; // 日付を設定
+  }
+
+  if(type) {
+    const typeInput = document.querySelector(`input[name="type"][value="${type}"]`);
+    if (typeInput) {
+      typeInput.checked = true; // 収支タイプを設定
+      if (typeof updateDropdown === 'function') {
+        updateDropdown(type); // 選択されたタイプに応じてプルダウンを更新
+      }
+    }
+  }
+
+  if(category) {
+    setTimeout(() => {
+      const categorySelect = document.getElementById("category");
+      if (categorySelect) categorySelect.value = category; // カテゴリを設定
+    }, 100); // DOMの更新を待つために少し遅延させる
+  }
+
+  if(amount) {
+    const amountInput = document.getElementById("amount");
+    if (amountInput) amountInput.value = amount; // 金額を設定
+  }
 });
 
 // ボタンを制御する関数
@@ -84,9 +118,7 @@ function updateDropdown(selectedValue) {
 
 // フォームの内容を取得
 document.getElementById("expenseForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-
-  console.log("ふぉーむが送信されました！");
+  e.preventDefault(); // フォームのデフォルトの送信を防止
 
   // ユーザに確認メッセージを表示
   const isConfirmed = confirm("登録してもよろしいですか？");
@@ -106,12 +138,6 @@ document.getElementById("expenseForm").addEventListener("submit", async function
     const categorySelect = document.getElementById("category"); // カテゴリ
     const category = categorySelect.options[categorySelect.selectedIndex].text; // カテゴリ
     const amount = document.getElementById("amount").value; // 金額
-
-    // 画面に表示
-    //const expensesList = document.getElementById("expenses");
-    //const listItem = document.createElement("li");
-    //listItem.textContent = `${date} ${incomeOrExpenditure} ${category} ${amount}円`;
-    //expensesList.appendChild(listItem);
 
     // フォームをクリア
     setDateValues(); // 日付を今日の日付にリセット

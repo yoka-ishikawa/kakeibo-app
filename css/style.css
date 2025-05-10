@@ -121,9 +121,7 @@ button {
   /* ボタン内の内容を垂直方向に中央に配置 */
   justify-content: center;
   /* ボタン内の内容を水平方向に中央に配置 */
-  width: 100%;
-  /* ボタンの幅を親要素の幅に合わせる */
-  max-width: 320px;
+  max-width: 100px;
   /* ボタンの最大幅を320pxに制限 */
   height: 50px; 
   /* 高さを50pxに設定 */
@@ -238,14 +236,6 @@ table {
   margin-top: 20px; /* テーブルの上に20pxのマージンを追加 */
 }
 
-/* テーブルのセルのスタイル */
-th,
-td {
-  border: 1px solid #ddd; /* セルの枠線を1pxの灰色に設定 */
-  padding: 8px; /* セルの内側に8pxのパディングを追加 */
-  text-align: left; /* セルのテキストを左寄せにする */
-}
-
 /* テーブルのヘッダーのスタイル */
 th {
   background-color: #f4f4f4; /* ヘッダーの背景色を灰色に設定 */
@@ -274,26 +264,33 @@ tr:nth-child(even) {
     width: 100%;  /* スマホでは幅を100%に設定 */
     padding: 10px;  /* 内側の余白を調整 */
   }
+}
 
-  a {
-    display: block;  /* aタグをブロック要素に変更して幅を取らせる */
-    width: 100%;  /* 幅を100%に設定 */
-    text-align: center;  /* テキストを中央揃え */
-    padding: 10px 0;  /* 上下にパディングを追加 */
-    box-sizing: border-box;  /* 幅にパディングを含める */
+@media screen and (max-width: 600px) {
+  .bottonGroup {
+    flex-direction: column; /* スマホでは縦並びに変更する */
   }
+}
 
-  .container {
-    width: 100%;  /* スマホの場合、幅を100%に設定 */
-    padding: 10px;  /* パディングを調整 */
-  }
+a {
+   display: block;  /* aタグをブロック要素に変更して幅を取らせる */
+   width: 100%;  /* 幅を100%に設定 */
+   text-align: center;  /* テキストを中央揃え */
+   padding: 10px 0;  /* 上下にパディングを追加 */
+   box-sizing: border-box;  /* 幅にパディングを含める */
+ }
 
-  form {
-    width: 100%;  /* フォームの幅を親要素の幅に合わせる */
-    padding: 20px;  /* フォーム内のパディングを調整 */
-    max-width: none;  /* 最大幅制限を削除 */
-    box-sizing: border-box;  /* 幅にパディングを含める */
-  }
+ .container {
+   width: 100%;  /* スマホの場合、幅を100%に設定 */
+   padding: 10px;  /* パディングを調整 */
+ }
+
+ form {
+   width: 100%;  /* フォームの幅を親要素の幅に合わせる */
+   padding: 20px;  /* フォーム内のパディングを調整 */
+   max-width: none;  /* 最大幅制限を削除 */
+   box-sizing: border-box;  /* 幅にパディングを含める */
+ }
 
   form p {
     flex-direction: row;  /* 横並び */
@@ -323,19 +320,6 @@ tr:nth-child(even) {
     max-width: none;  /* 最大幅制限を削除 */
   }
 
-  /* 収支登録画面のボタン */
-  .buttonRound {
-    width: 100%;  /* ボタンの幅を100%に設定 */
-    max-width: none;  /* 最大幅制限を削除 */
-    padding: 12px 24px;  /* パディングを調整 */
-  }
-
-  .buttonReturn {
-    width: 100%;  /* 戻るボタンの幅を100%に設定 */
-    max-width: none;  /* 最大幅制限を削除 */
-    padding: 12px 24px;  /* パディングを調整 */
-  }
-
   footer {
     width: 100%;  /* フッター内のボタンの幅を100%に設定 */
     padding: 10px 0;  /* 上下のパディングを調整 */
@@ -345,7 +329,6 @@ tr:nth-child(even) {
     flex-direction: row;  /* ボタンを縦並びに変更 */
     gap: 15px;  /* ボタン間の間隔を広げる */
   }
-}
 
 /* ボタンの共通スタイル */
 #registButton {
@@ -371,7 +354,7 @@ tr:nth-child(even) {
   }
   
   /* テーブルの全体的なスタイル */
-  Table {
+  table {
     width: 100%;
     border-collapse: collapse; /* セルの境界線を統一 */
     font-size: 16px;
@@ -385,13 +368,15 @@ tr:nth-child(even) {
     font-weight: bold;
   }
   
-  Th, Td {
-    padding: 12px 15px; /* セル内の余白 */
+  th, td {
+    padding: 8px; /* セルの内側に8pxのパディングを追加 */
     border: 1px solid #ddd; /* 枠線を追加 */
     text-align: left; /* 左寄せ */
+    border: 1px solid #ddd; /* セルの枠線を1pxの灰色に設定 */
+    text-align: left; /* セルのテキストを左寄せにする */
   }
   
-  Th {
+  th {
     background-color: #fff; /* ヘッダーの背景色 */
     position: sticky;
     top: 0; /* ヘッダーをスクロール時に固定 */
@@ -399,14 +384,14 @@ tr:nth-child(even) {
   }
   
   /* 左寄せ・右寄せのカラムの固定 */
-  Th[fixed="left"], Td[fixed="left"] {
+  th[fixed="left"], td[fixed="left"] {
     position: sticky;
     left: 0;
     background-color: #fff; /* 固定された列の背景色 */
     z-index: 1;
   }
   
-  Th[fixed="right"], Td[fixed="right"] {
+  th[fixed="right"], td[fixed="right"] {
     position: sticky;
     right: 0;
     background-color: #fff; /* 固定された列の背景色 */
@@ -434,15 +419,14 @@ tr:nth-child(even) {
     padding: 4px 8px;
     font-size: 12px;
   }
-  
-  /* 操作ボタンセルの整列 */
-  Td[fixed="right"] {
-    text-align: center;  /* 中央揃え */
-    display: flex;
-    justify-content: center;  /* ボタンを中央揃え */
-    gap: 10px;  /* ボタンの間に10pxの間隔を追加 */
-  }
-  
+
+td[fixed="right"] button {
+  text-align: center;  /* 中央揃え */
+  /* display: flex;*/
+  display: flex;
+  justify-content: center;  /* ボタンを中央揃え */
+  gap: 10px;  /* ボタンの間に10pxの間隔を追加 */
+}
   /* テーブル内の各行の間隔 */
   tbody tr {
     background-color: #fff; /* 各行の背景色 */
@@ -451,3 +435,22 @@ tr:nth-child(even) {
   tbody tr:hover {
     background-color: #f9f9f9; /* 行にカーソルを合わせたときの背景色 */
   }
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+ h1 {
+   font-size: 24px; /* タイトルのフォントサイズ */
+   font-weight: bold; /* 太字 */
+   margin-bottom: 20px; /* タイトルとコンテンツの間に余白 */
+   text-align: center; /* 中央揃え */
+ }
