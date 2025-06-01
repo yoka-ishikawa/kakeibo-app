@@ -189,6 +189,7 @@ document
         });
 
         if (!response.ok) {
+          console.error("登録に失敗:", response.status, response.statusText);
           throw new Error("登録に失敗しました。");
         }
 
