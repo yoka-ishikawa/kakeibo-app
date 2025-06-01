@@ -189,7 +189,7 @@ document
         });
 
         if (!response.ok) {
-          console.error("登録に失敗:", response.status, response.statusText);
+          console.error("登録に失敗:", JSON.stringify(response, null, 2));
           throw new Error("登録に失敗しました。");
         }
 
