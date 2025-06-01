@@ -179,14 +179,17 @@ document
 
         // ローカルストレージからユーザートークンを取得
         const userToken = localStorage.getItem("userToken");
-        const response = await fetch("/api/infokanri", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-User-Token": userToken, // ユーザートークンをヘッダーに追加
-          },
-          body: JSON.stringify(payload),
-        });
+        const response = await fetch(
+          "https://gwtjqewcrchqjsywvqjc.supabase.co",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-User-Token": userToken, // ユーザートークンをヘッダーに追加
+            },
+            body: JSON.stringify(payload),
+          }
+        );
 
         if (!response.ok) {
           console.error("登録に失敗:", JSON.stringify(response, null, 2));
