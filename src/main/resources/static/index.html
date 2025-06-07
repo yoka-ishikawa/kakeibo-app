@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>家計簿管理</title>
+    <meta name="description" content="収支を把握するための家計簿管理" />
+    <!-- GitHub Pages , springBoot どちらにもパスが対応できるようにする -->
+    <script>
+      const isLocalhost =
+        location.hostname === "localhost" || location.hostname === "127.0.0.1";
+      const base = document.createElement("base");
+      base.href = isLocalhost ? "/" : "/kakeibo-app/";
+      document.head.appendChild(base);
+    </script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <h1>家計簿管理メニュー</h1>
+    <div class="menucontainer">
+      <!-- 収支登録ボタン -->
+      <a class="menuButton" href="inexpen.html">収支登録</a>
+      <!-- 収支登録一覧ボタン -->
+      <a class="menuButton" href="list.html">収支登録一覧</a>
+      <!-- レポートボタン -->
+      <a class="menuButton" href="report.html">レポート</a>
+    </div>
+  </body>
+</html>
