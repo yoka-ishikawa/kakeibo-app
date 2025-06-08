@@ -6,13 +6,13 @@ WORKDIR /app
 
 # Maven とソースをコピーしてビルド
 COPY . .
-RUN ./mvnw clean package -DskipTests
+RUN chmod +x mvnw && ./mvnw clean package -DskipTests
 
 # 実行フェーズ
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# jar ファイルコピー（ファイル名はあなたの jar に合わせて変更）
+# jar ファイルコピー
 COPY --from=build /app/target/webapp-0.0.1-SNAPSHOT.jar app.jar
 
 # アプリ実行
