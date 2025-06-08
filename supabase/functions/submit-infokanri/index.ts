@@ -18,16 +18,26 @@ serve(async (req) => {
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
-      headers: { "Access-Control-Allow-Origin": "*" },
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
   }
 
   const token = authHeader.split(" ")[1];
+  const validTokens = [
+    "github_pat_token",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
+  ];
   // トークンの正当性の検証処理
-  if (!token || token !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
+  if (!token || !validTokens.includes(token)) {
     return new Response(JSON.stringify({ error: "Invalid token" }), {
       status: 401,
-      headers: { "Access-Control-Allow-Origin": "*" },
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
   }
 
