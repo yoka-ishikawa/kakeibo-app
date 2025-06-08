@@ -15,8 +15,8 @@ serve(async (req) => {
 
   const authHeader = req.headers.get("Authorization");
   // 認証ヘッダーが存在し、Bearerトークンが正しいか確認
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+  return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
       status: 401,
       headers: {
         "Content-Type": "application/json",
