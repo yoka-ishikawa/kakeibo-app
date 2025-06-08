@@ -190,11 +190,11 @@ document
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              // ユーザートークンをヘッダーに追加
+              Authorization: `Bearer ${userToken}`,
               // SupabaseのAPIキーを設定
               apiKey:
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3dGpxZXdjcmNocWpzeXd2cWpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNDM4MzIsImV4cCI6MjA2MzcxOTgzMn0.aHCS6lI0Ka2nmUK7KOMWy2XpTQXyqHBxY-wmLlZHEHU",
-              // ユーザートークンをヘッダーに追加
-              Authorization: `Bearer ${userToken}`,
             },
             body: JSON.stringify(payload),
           }
