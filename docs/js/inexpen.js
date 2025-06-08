@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     fetch("/api/user/token")
       .then((response) => response.json())
       .then((data) => {
+        console.log("取得したトークン:", data.userToken); // トークンをログに出力
         localStorage.setItem("userToken", data.userToken);
       });
   }
