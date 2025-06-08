@@ -1,6 +1,18 @@
 import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
 
 serve(async (req) => {
+  // OPTIONSメソッドの処理を追加
+  if (req.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204, // HTTPステータスコードを204に設定
+      headers: {
+        "Access-Control-Allow-Origin": "*", // 任意のオリジンを許可
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS", // 許可するHTTPメソッド
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey", // 許可するヘッダー
+      },
+    });
+  }
+
   const authHeader = req.headers.get("Authorization");
   // 認証ヘッダーが存在し、Bearerトークンが正しいか確認
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
