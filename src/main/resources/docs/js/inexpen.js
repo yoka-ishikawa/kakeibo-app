@@ -7,13 +7,16 @@ document.addEventListener("DOMContentLoaded", function () {
   console.log("ローカルストレージ:", JSON.stringify(localStorage)); // ローカルストレージの内容をログに出力
   // 最初のアクセス時にトークンを取得
   if (!localStorage.getItem("userToken")) {
-    // ローカルストレージにトークンがない場合
+    // ローカルストレージにトークンがない場合(Spring Boot用)
     fetch("/api/user/token")
       .then((response) => response.json())
       .then((data) => {
         console.log("取得したトークン:", data.userToken); // トークンをログに出力
         localStorage.setItem("userToken", data.userToken);
       });
+    // githubpages用
+  } else {
+    localStorage.setItem("userToken", "github_pat_token");
   }
 
   // 収支登録一覧画面で編集ボタンを押したときの処理
