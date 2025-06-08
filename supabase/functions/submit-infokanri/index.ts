@@ -1,17 +1,25 @@
 import { serve } from "https://deno.land/std@0.192.0/http/server.ts";
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, apikey, Authorization", // Authorizationを追加
-      },
+  const authHeader = req.headers.get("Authorization");
+  // 認証ヘッダーが存在し、Bearerトークンが正しいか確認
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Access-Control-Allow-Origin": "*" },
     });
   }
 
+  const token = authHeader.split(" ")[1];
+  // トークンの正当性の検証処理
+  if (!token || token !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
+    return new Response(JSON.stringify({ error: "Invalid token" }), {
+      status: 401,
+      headers: { "Access-Control-Allow-Origin": "*" },
+    });
+  }
+
+  // クライアントから送信された収支データを取得
   const { registeredAt, type, category, amount, updateDateTime } =
     await req.json();
 
