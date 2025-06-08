@@ -7,16 +7,18 @@ document.addEventListener("DOMContentLoaded", function () {
   console.log("ローカルストレージ:", JSON.stringify(localStorage)); // ローカルストレージの内容をログに出力
   // 最初のアクセス時にトークンを取得
   if (!localStorage.getItem("userToken")) {
-    // ローカルストレージにトークンがない場合(Spring Boot用)
+    // トークンがなければ Spring Boot から取得
     fetch("/api/user/token")
       .then((response) => response.json())
       .then((data) => {
-        console.log("取得したトークン:", data.userToken); // トークンをログに出力
+        console.log("取得したトークン:", data.userToken);
         localStorage.setItem("userToken", data.userToken);
+      })
+      .catch(() => {
+        // Spring Boot が動いてない or GitHub Pages 用 fallback
+        console.warn("トークン取得失敗 → GitHub用トークンに切り替え");
+        localStorage.setItem("userToken", "github_pat_token");
       });
-    // githubpages用
-  } else {
-    localStorage.setItem("userToken", "github_pat_token");
   }
 
   // 収支登録一覧画面で編集ボタンを押したときの処理
@@ -185,7 +187,7 @@ document
         // ローカルストレージからユーザートークンを取得
         const userToken = localStorage.getItem("userToken");
         const response = await fetch(
-          "https://gwtjqewcrchqjsywvqjc.functions.supabase.co/submit-infokanri",
+          "https://kakeibo-app-gy0m.onrender.com/api/infokanri",
           {
             method: "POST",
             headers: {
