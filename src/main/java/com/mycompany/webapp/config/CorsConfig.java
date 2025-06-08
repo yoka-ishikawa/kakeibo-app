@@ -10,9 +10,9 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // すべてのパスに対して
-                .allowedOrigins("https://yoka-ishikawa.github.io") // フロントのURLを許可
+                .allowedOrigins("https://kakeibo-app-gy0m.onrender.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 必要なHTTPメソッド
                 .allowedHeaders("*") // 任意のヘッダーを許可
-                .allowCredentials(false); // クッキーや認証情報を使わないなら false
+                .allowCredentials(true); // クッキーや認証情報を使用
     }
 }
