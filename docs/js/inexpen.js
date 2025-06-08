@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   updateDropdown("income"); // デフォルトは"収入"
   setupButtonControl(); // 登録ボタンの制御を設定
 
+  console.log(JSON.stringify(localStorage)); // ローカルストレージの内容をログに出力
   // 最初のアクセス時にトークンを取得
   if (!localStorage.getItem("userToken")) {
     // ローカルストレージにトークンがない場合
