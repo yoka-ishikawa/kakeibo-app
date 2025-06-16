@@ -1,29 +1,48 @@
-// DOMが完全に読み込まれた後に初期値を設定
+/**
+ * 収支登録画面の初期化処理
+ * - フォーム要素の初期値設定
+ * - ユーザー認証トークンの取得・管理
+ * - 編集モード時のデータ復元
+ */
 document.addEventListener("DOMContentLoaded", function () {
-  setDateValues(); // 年月日の初期値を設定
-  updateDropdown("income"); // デフォルトは"収入"
-  setupButtonControl(); // 登録ボタンの制御を設定
+  // フォーム初期化
+  setDateValues();
+  updateDropdown("income");
+  setupButtonControl();
 
-  console.log("ローカルストレージ:", JSON.stringify(localStorage)); // ローカルストレージの内容をログに出力
-  // 最初のアクセス時にトークンを取得
+  // ユーザー認証トークンの初期化
+  initializeUserToken();
+
+  // 編集モード時のデータ復元処理
+  // URLパラメータから既存データを取得してフォームに設定
+  restoreFormDataFromURL();
+});
+
+/**
+ * ユーザー認証トークンの初期化
+ * localStorageにトークンがない場合、サーバーから取得
+ */
+function initializeUserToken() {
   if (!localStorage.getItem("userToken")) {
-    // トークンがなければ Spring Boot から取得
     fetch("/api/user/token")
       .then((response) => response.json())
       .then((data) => {
-        console.log("取得したトークン:", data.userToken);
         localStorage.setItem("userToken", data.userToken);
       })
       .catch(() => {
-        // Spring Boot が動いてない or GitHub Pages 用 fallback
-        console.warn("トークン取得失敗 → GitHub用トークンに切り替え");
-        localStorage.setItem("userToken", "github_pat_token");
+        // サーバーからの取得に失敗した場合のフォールバック
+        localStorage.setItem("userToken", "fallback_token_" + Date.now());
       });
   }
+}
 
-  // 収支登録一覧画面で編集ボタンを押したときの処理
+/**
+ * URLパラメータからフォームデータを復元
+ * 編集モード時に使用
+ */
+function restoreFormDataFromURL() {
   const params = new URLSearchParams(window.location.search);
-
+  
   const id = params.get("id");
   const date = params.get("date");
   const type = params.get("type");
@@ -84,27 +103,29 @@ function setupButtonControl() {
     }
   }
 
+  // 初期状態をチェック
   checkInputs();
 
-  // 入力・選択変更を監視
+  // 入力値変更時にボタン状態を再チェック
   inputs.forEach((input) => {
     input.addEventListener("input", checkInputs);
     input.addEventListener("change", checkInputs);
   });
 }
 
-// 年月と年月日の初期値を設定する関数
+/**
+ * 日付入力フィールドに今日の日付を設定
+ */
 function setDateValues() {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
+  const todayFormatted = `${year}-${month}-${day}`;
 
-  // YYYY-MM-DD形式（年月日）
-  const inputstartdate = document.getElementById("date");
-  if (inputstartdate) {
-    const date = `${year}-${month}-${day}`;
-    inputstartdate.value = date;
+  const dateInput = document.getElementById("date");
+  if (dateInput) {
+    dateInput.value = todayFormatted;
   }
 }
 

@@ -6,35 +6,53 @@ import com.mycompany.webapp.model.Infokanri;
 import com.mycompany.webapp.service.InfokanriService;
 import java.util.List;
 
+/**
+ * 家計簿データ管理用REST APIコントローラー
+ * 収支データのCRUD操作とレポート機能を提供
+ */
 @RestController
 @RequestMapping("/api/infokanri")
 public class InfokanriController {
 
     private final InfokanriService service;
 
+    /**
+     * コンストラクターインジェクションによるサービス層の依存性注入
+     */
     public InfokanriController(InfokanriService service) {
         this.service = service;
     }
 
+    /**
+     * 新しい収支データを登録
+     * @param infokanri 登録する収支データ
+     * @param userToken ユーザー識別トークン（リクエストヘッダーから取得）
+     * @return 登録された収支データ（IDを含む）
+     */
     @PostMapping
     public Infokanri add(@RequestBody Infokanri infokanri,
             @RequestHeader("X-User-Token") String userToken) {
-        // ユーザートークンをInfokanriオブジェクトに設定
         infokanri.setUserToken(userToken);
-        // Infokanriオブジェクトを保存
         return service.saveInfokanri(infokanri);
     }
 
+    /**
+     * 全ての収支データを取得
+     * @return 全収支データのリスト
+     */
     @GetMapping
     public List<Infokanri> getAllData() {
-        // すべてのデータを取得
         return service.getAllInfokanri();
     }
 
+    /**
+     * 指定されたIDの収支データを削除
+     * @param id 削除対象のデータID
+     * @return HTTP 200 (成功) または HTTP 404 (データが見つからない)
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteData(@PathVariable Long id) {
         try {
-            // IDでデータを削除
             service.deleteInfokanri(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -42,20 +60,33 @@ public class InfokanriController {
         }
     }
 
+    /**
+     * 既存の収支データを更新
+     * @param id 更新対象のデータID
+     * @param infokanri 更新内容
+     * @param userToken ユーザー識別トークン
+     * @return 更新された収支データ
+     */
     @PutMapping("/{id}")
     public Infokanri updateData(@PathVariable Long id, @RequestBody Infokanri infokanri,
             @RequestHeader("X-User-Token") String userToken) {
-        // IDでデータを更新
         infokanri.setId(id);
         infokanri.setUserToken(userToken);
         return service.updateInfokanri(infokanri);
     }
 
+    /**
+     * レポート画面用のデータを取得
+     * 現在は全データを返すが、将来的には期間フィルタリング機能を実装予定
+     * @param period 期間指定（月間/年間）
+     * @param startDate 開始日
+     * @param endDate 終了日
+     * @return フィルタリングされた収支データのリスト
+     */
     @GetMapping("/report")
     public List<Infokanri> getReportData(@RequestParam(required = false) String period,
                                          @RequestParam(required = false) String startDate,
                                          @RequestParam(required = false) String endDate) {
-        // レポート用データを取得
         return service.getReportData(period, startDate, endDate);
     }
 }
