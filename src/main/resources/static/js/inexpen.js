@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // 収支登録一覧画面で編集ボタンを押したときの処理
   const params = new URLSearchParams(window.location.search);
 
+  const id = params.get("id");
   const date = params.get("date");
   const type = params.get("type");
   const category = params.get("category");
@@ -171,7 +172,7 @@ document
         categorySelect.options[categorySelect.selectedIndex].text; // カテゴリ
       const amount = document.getElementById("amount").value; // 金額
 
-      // 収支登録APIにPOSTリクエストを送信
+      // 収支登録またはAPIにリクエストを送信
       try {
         const payload = {
           registeredAt: date,
@@ -184,40 +185,50 @@ document
 
         // ローカルストレージからユーザートークンを取得
         const userToken = localStorage.getItem("userToken");
-        const response = await fetch(
-          "/api/infokanri",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // ユーザートークンをヘッダーに追加
-              "X-User-Token": userToken,
-            },
-            body: JSON.stringify(payload),
-          }
-        );
+        
+        // 編集モードの場合はPUT、新規登録の場合はPOST
+        const isEditMode = id !== null;
+        const method = isEditMode ? "PUT" : "POST";
+        const url = isEditMode ? `/api/infokanri/${id}` : "/api/infokanri";
+        
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            "Content-Type": "application/json",
+            "X-User-Token": userToken,
+          },
+          body: JSON.stringify(payload),
+        });
 
         if (!response.ok) {
           console.error("登録に失敗:", JSON.stringify(response, null, 2));
           throw new Error("登録に失敗しました。");
         }
 
-        // 登録成功時の処理
-        console.log("登録成功:", await response.json());
+        // 登録/更新成功時の処理
+        const result = await response.json();
+        console.log(isEditMode ? "更新成功:" : "登録成功:", result);
       } catch (error) {
-        console.error("登録エラー:", error);
-        alert("登録中にエラーが発生しました。");
+        console.error(isEditMode ? "更新エラー:" : "登録エラー:", error);
+        alert((isEditMode ? "更新" : "登録") + "中にエラーが発生しました。");
         return; // エラーが発生した場合は処理を中断
       }
 
-      // フォームをクリア
-      setDateValues(); // 日付を今日の日付にリセット
-      document.getElementById("category").value = ""; // カテゴリを未選択に
-      document.getElementById("amount").value = ""; // 金額をクリア
-      setupButtonControl(); // 登録ボタンの制御を設定
+      // フォームをクリア（新規登録の場合のみ）
+      if (!isEditMode) {
+        setDateValues(); // 日付を今日の日付にリセット
+        document.getElementById("category").value = ""; // カテゴリを未選択に
+        document.getElementById("amount").value = ""; // 金額をクリア
+        setupButtonControl(); // 登録ボタンの制御を設定
+      }
 
-      // 登録完了ポップアップを表示
-      alert("登録が完了しました！");
+      // 完了ポップアップを表示
+      alert((isEditMode ? "更新" : "登録") + "が完了しました！");
+      
+      // 編集モードの場合は一覧画面に戻る
+      if (isEditMode) {
+        window.location.href = "list.html";
+      }
     } else {
       // キャンセルが押された場合、何もしない
       alert("登録がキャンセルされました");

@@ -24,25 +24,62 @@ document.addEventListener("DOMContentLoaded", function () {
   // レポートを表示ボタンをクリックした時の処理
   const reportButton = document.getElementById("displayButton");
 
-  reportButton.addEventListener("click", function () {
-    document.getElementById("report-area").style.display = "block"; // レポートを表示
+  reportButton.addEventListener("click", async function () {
+    try {
+      // レポートデータを取得
+      const response = await fetch("/api/infokanri/report");
+      const data = await response.json();
 
-    // ここでレポートのデータを取得して表示する処理を追加
-    // 例: fetch('/api/report')
-    // プルダウン選択肢を基に年間のデータ、または月間のデータを取得
-    // 例: fetch(`/api/report?period=${periodSelect.value}`)
-    // .then(response => response.json())
-    // .then(data => {
-    //   // レポートデータを表示する処理
-    // });
-    // 例: document.getElementById("report-content").innerHTML = data;
-    // ここではダミーデータを表示
-    // const reportContent = document.getElementById("report-area");
-    // if (periodSelect.value === "monthly") {
-    //   reportContent.innerHTML = "<h2>月間レポート</h2><p>ここに月間レポートの内容が表示されます。</p>";
-    //} else if (periodSelect.value === "yearly") {
-    //  reportContent.innerHTML = "<h2>年間レポート</h2><p>ここに年間レポートの内容が表示されます。</p>";
-    //}
+      // レポートエリアを表示
+      document.getElementById("report-area").style.display = "block";
+
+      // 収支を計算
+      let totalIncome = 0;
+      let totalExpenditure = 0;
+
+      data.forEach((item) => {
+        if (item.type === "income") {
+          totalIncome += item.amount;
+        } else if (item.type === "expenditure") {
+          totalExpenditure += item.amount;
+        }
+      });
+
+      const balance = totalIncome - totalExpenditure;
+
+      // レポート表示を更新
+      document.querySelector(".income").textContent = `収入: ¥ ${totalIncome.toLocaleString()}`;
+      document.querySelector(".expenditure").textContent = `支出: ¥ ${totalExpenditure.toLocaleString()}`;
+      document.querySelector(".income-expenditure").textContent = `収支: ¥ ${balance.toLocaleString()}`;
+
+      // テーブルを更新
+      const tbody = document.querySelector("tbody");
+      tbody.innerHTML = "";
+
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4">データがありません</td></tr>';
+        return;
+      }
+
+      data.forEach((item) => {
+        const row = document.createElement("tr");
+        const typeText = item.type === "income" ? "収入" : "支出";
+        const amountText = item.amount.toLocaleString() + "円";
+
+        row.innerHTML = `
+          <td>${item.registeredAt}</td>
+          <td>${typeText}</td>
+          <td>${item.category}</td>
+          <td>${amountText}</td>
+        `;
+
+        tbody.appendChild(row);
+      });
+
+    } catch (error) {
+      console.error("レポートデータ取得エラー:", error);
+      alert("レポートデータの取得に失敗しました。");
+    }
   });
 });
 

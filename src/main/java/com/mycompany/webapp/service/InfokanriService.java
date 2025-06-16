@@ -22,8 +22,27 @@ public class InfokanriService {
         return repository.save(infokanri);
     }
 
-    // すべてのデータを取得するメソッド（テスト用）
+    // すべてのデータを取得するメソッド
     public List<Infokanri> getAllInfokanri() {
+        return repository.findAll();
+    }
+
+    // データを削除するメソッド
+    @Transactional
+    public void deleteInfokanri(Long id) {
+        repository.deleteById(id);
+    }
+
+    // データを更新するメソッド
+    @Transactional
+    public Infokanri updateInfokanri(Infokanri infokanri) {
+        return repository.save(infokanri);
+    }
+
+    // レポート用データを取得するメソッド
+    public List<Infokanri> getReportData(String period, String startDate, String endDate) {
+        // 簡易実装：現状では全データを返す
+        // 実際の実装では期間フィルタリングを行う
         return repository.findAll();
     }
 

@@ -1,68 +1,108 @@
-// 編集ボタンの処理
-const editButtons = document.querySelectorAll(".edit-button");
-editButtons.forEach((button) => {
-  button.addEventListener("click", function () {
-    const row = this.closest("tr");
-    const expenseId = row.dataset.expenseId;
-    const date = row.querySelector(".date-cell").textContent.trim();
-    const type =
-      row.querySelector(".type-cell").textContent === "収入"
-        ? "income"
-        : "expenditure";
-    const category = row.querySelector(".category-cell").textContent.trim();
-    const amount = row
-      .querySelector(".amount-cell")
-      .textContent.trim()
-      .replace("円", "")
-      .replace(/,/g, ""); // 金額から「円」とカンマを削除
+// DOMが読み込まれた後に実行
+document.addEventListener("DOMContentLoaded", function () {
+  loadDataList();
+});
 
-    const params = new URLSearchParams({
-      expenseId,
-      date,
-      type,
-      category,
-      amount,
+// データ一覧を読み込む関数
+async function loadDataList() {
+  try {
+    const response = await fetch("/api/infokanri");
+    const data = await response.json();
+    
+    const tbody = document.querySelector("tbody");
+    tbody.innerHTML = ""; // 既存のデータをクリア
+
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5">データがありません</td></tr>';
+      return;
+    }
+
+    data.forEach((item) => {
+      const row = document.createElement("tr");
+      row.dataset.id = item.id;
+      
+      const typeText = item.type === "income" ? "収入" : "支出";
+      const amountText = item.amount.toLocaleString() + "円";
+      
+      row.innerHTML = `
+        <td class="date-cell">${item.registeredAt}</td>
+        <td class="type-cell">${typeText}</td>
+        <td class="category-cell">${item.category}</td>
+        <td class="amount-cell">${amountText}</td>
+        <td>
+          <div class="button-wrapper">
+            <button class="edit-button">編集</button>
+            <button class="delete-button">削除</button>
+          </div>
+        </td>
+      `;
+      
+      tbody.appendChild(row);
     });
 
-    const editUrl = `inexpen.html?${params.toString()}`;
+    // イベントリスナーを再設定
+    setupEventListeners();
+  } catch (error) {
+    console.error("データ取得エラー:", error);
+    alert("データの取得に失敗しました。");
+  }
+}
 
-    window.location.href = editUrl;
-  });
-});
-// 削除ボタンの処理
-document.querySelectorAll(".delete-button").forEach((button) => {
-  button.addEventListener("click", function () {
-    // 削除ボタンがクリックされたときの処理
-    const row = this.closest("tr"); // ボタンが属する行を取得
-    const expenseId = row.dataset.expenseId; // 行のデータ属性からexpenseIdを取得
+// イベントリスナーを設定する関数
+function setupEventListeners() {
+  // 編集ボタンの処理
+  document.querySelectorAll(".edit-button").forEach((button) => {
+    button.addEventListener("click", function () {
+      const row = this.closest("tr");
+      const id = row.dataset.id;
+      const date = row.querySelector(".date-cell").textContent.trim();
+      const type = row.querySelector(".type-cell").textContent === "収入" ? "income" : "expenditure";
+      const category = row.querySelector(".category-cell").textContent.trim();
+      const amount = row
+        .querySelector(".amount-cell")
+        .textContent.trim()
+        .replace("円", "")
+        .replace(/,/g, "");
 
-    // 確認ダイアログを表示
-    const isConfirmed = confirm("削除してもよろしいですか？");
-    if (isConfirmed) {
-      row.remove(); // 見た目だけ削除実行
-      alert("削除が完了しました。");
-
-      // 削除処理を実行（DB連携後にコメントアウトを解除）
-      /*
-      fetch('/api/expense/${expenseId}', {
-        method: 'DELETE'
-      })
-      .then(Response => {
-        if (Response.ok) {
-          // 削除成功時、行をテーブルから削除
-          row.remove();
-          alert("削除が完了しました。");
-        } else {
-          alert("削除に失敗しました。");
-        }
-      })
-      .catch(error => {
-        console.error('削除エラー:', error);
-        alert("削除中にエラーが発生しました。");
+      const params = new URLSearchParams({
+        id,
+        date,
+        type,
+        category,
+        amount,
       });
-      */
-    } else {
-      alert("削除がキャンセルされました。");
-    }
+
+      const editUrl = `inexpen.html?${params.toString()}`;
+      window.location.href = editUrl;
+    });
   });
-});
+
+  // 削除ボタンの処理
+  document.querySelectorAll(".delete-button").forEach((button) => {
+    button.addEventListener("click", async function () {
+      const row = this.closest("tr");
+      const id = row.dataset.id;
+
+      const isConfirmed = confirm("削除してもよろしいですか？");
+      if (isConfirmed) {
+        try {
+          const response = await fetch(`/api/infokanri/${id}`, {
+            method: "DELETE",
+          });
+
+          if (response.ok) {
+            row.remove();
+            alert("削除が完了しました。");
+          } else {
+            alert("削除に失敗しました。");
+          }
+        } catch (error) {
+          console.error("削除エラー:", error);
+          alert("削除中にエラーが発生しました。");
+        }
+      } else {
+        alert("削除がキャンセルされました。");
+      }
+    });
+  });
+}

@@ -26,7 +26,30 @@ public class InfokanriController {
 
     @GetMapping
     public List<Infokanri> getAllData() {
-        // すべてのデータを取得（テスト用）
+        // すべてのデータを取得
         return service.getAllInfokanri();
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteData(@PathVariable Long id) {
+        // IDでデータを削除
+        service.deleteInfokanri(id);
+    }
+
+    @PutMapping("/{id}")
+    public Infokanri updateData(@PathVariable Long id, @RequestBody Infokanri infokanri,
+            @RequestHeader("X-User-Token") String userToken) {
+        // IDでデータを更新
+        infokanri.setId(id);
+        infokanri.setUserToken(userToken);
+        return service.updateInfokanri(infokanri);
+    }
+
+    @GetMapping("/report")
+    public List<Infokanri> getReportData(@RequestParam(required = false) String period,
+                                         @RequestParam(required = false) String startDate,
+                                         @RequestParam(required = false) String endDate) {
+        // レポート用データを取得
+        return service.getReportData(period, startDate, endDate);
     }
 }
