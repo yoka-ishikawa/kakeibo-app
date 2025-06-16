@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import com.mycompany.webapp.model.Infokanri; // Entityをインポート
 import com.mycompany.webapp.repository.InfokanriRepository; // Rrpositoryをインポート
 import jakarta.transaction.Transactional;
+import java.util.List;
 
 // InfokanriRepositoryを使用してDB操作を行うサービスクラス
 @Service
@@ -19,6 +20,11 @@ public class InfokanriService {
     @Transactional
     public Infokanri saveInfokanri(Infokanri infokanri) {
         return repository.save(infokanri);
+    }
+
+    // すべてのデータを取得するメソッド（テスト用）
+    public List<Infokanri> getAllInfokanri() {
+        return repository.findAll();
     }
 
 }
