@@ -163,10 +163,8 @@ document
         'input[name="type"]:checked'
       ); // 収入か支出か
       const incomeOrExpenditure = selectedOption
-        ? selectedOption.value === "income"
-          ? "収入"
-          : "支出"
-        : null; // "収入" または "支出" を取得
+        ? selectedOption.value
+        : null; // "income" または "expenditure" を取得
 
       const categorySelect = document.getElementById("category"); // カテゴリ
       const category =
@@ -187,16 +185,13 @@ document
         // ローカルストレージからユーザートークンを取得
         const userToken = localStorage.getItem("userToken");
         const response = await fetch(
-          "https://kakeibo-app-gy0m.onrender.com/api/infokanri",
+          "/api/infokanri",
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               // ユーザートークンをヘッダーに追加
-              Authorization: `Bearer ${userToken}`,
-              // SupabaseのAPIキーを設定
-              apiKey:
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3dGpxZXdjcmNocWpzeXd2cWpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNDM4MzIsImV4cCI6MjA2MzcxOTgzMn0.aHCS6lI0Ka2nmUK7KOMWy2XpTQXyqHBxY-wmLlZHEHU",
+              "X-User-Token": userToken,
             },
             body: JSON.stringify(payload),
           }

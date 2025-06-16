@@ -29,20 +29,44 @@ public class Infokanri {
   private Timestamp updateDateTime;
 
   // getter/setter
+  public Long getId() {
+    return id;
+  }
+  public void setId(Long id) {
+    this.id = id;
+  }
+  public String getUserToken() {
+    return userToken;
+  }
   public void setUserToken(String userToken) {
     this.userToken = userToken;
   }
-  public void setregisteredAt(LocalDate registeredAt) {
+  public LocalDate getRegisteredAt() {
+    return registeredAt;
+  }
+  public void setRegisteredAt(LocalDate registeredAt) {
     this.registeredAt = registeredAt;
+  }
+  public String getType() {
+    return type;
   }
   public void setType(String type) {
     this.type = type;
   }
+  public String getCategory() {
+    return category;
+  }
   public void setCategory(String category) {
     this.category = category;
   }
+  public Integer getAmount() {
+    return amount;
+  }
   public void setAmount(Integer amount) {
     this.amount = amount;
+  }
+  public Timestamp getUpdateDateTime() {
+    return updateDateTime;
   }
   public void setUpdateDateTime(Timestamp updateDateTime) {
     this.updateDateTime = updateDateTime;
