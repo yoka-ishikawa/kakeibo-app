@@ -30,20 +30,30 @@ public class InfokanriService {
     // データを削除するメソッド
     @Transactional
     public void deleteInfokanri(Long id) {
-        repository.deleteById(id);
+        if (id != null && repository.existsById(id)) {
+            repository.deleteById(id);
+        }
     }
 
     // データを更新するメソッド
     @Transactional
     public Infokanri updateInfokanri(Infokanri infokanri) {
-        return repository.save(infokanri);
+        if (infokanri != null) {
+            return repository.save(infokanri);
+        }
+        return null;
     }
 
     // レポート用データを取得するメソッド
     public List<Infokanri> getReportData(String period, String startDate, String endDate) {
-        // 簡易実装：現状では全データを返す
-        // 実際の実装では期間フィルタリングを行う
-        return repository.findAll();
+        try {
+            // 簡易実装：現状では全データを返す
+            // 実際の実装では期間フィルタリングを行う
+            return repository.findAll();
+        } catch (Exception e) {
+            // エラーが発生した場合は空のリストを返す
+            return new java.util.ArrayList<>();
+        }
     }
 
 }

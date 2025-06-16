@@ -1,6 +1,7 @@
 package com.mycompany.webapp.controller;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 import com.mycompany.webapp.model.Infokanri;
 import com.mycompany.webapp.service.InfokanriService;
 import java.util.List;
@@ -31,9 +32,14 @@ public class InfokanriController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteData(@PathVariable Long id) {
-        // IDでデータを削除
-        service.deleteInfokanri(id);
+    public ResponseEntity<Void> deleteData(@PathVariable Long id) {
+        try {
+            // IDでデータを削除
+            service.deleteInfokanri(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
