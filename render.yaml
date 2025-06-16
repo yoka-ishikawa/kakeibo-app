@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: kakeibo-app
+    env: java
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -Dserver.port=$PORT -jar target/webapp-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: JAVA_TOOL_OPTIONS
+        value: -XX:MaxRAMPercentage=50.0
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
