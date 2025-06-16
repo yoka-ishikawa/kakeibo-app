@@ -172,6 +172,11 @@ document
         categorySelect.options[categorySelect.selectedIndex].text; // カテゴリ
       const amount = document.getElementById("amount").value; // 金額
 
+      // 編集モードの判定（tryブロックの外で定義）
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
+      const isEditMode = id !== null;
+      
       // 収支登録またはAPIにリクエストを送信
       try {
         const payload = {
@@ -186,10 +191,7 @@ document
         // ローカルストレージからユーザートークンを取得
         const userToken = localStorage.getItem("userToken");
         
-        // 編集モードの場合はPUT、新規登録の場合はPOST
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get("id");
-        const isEditMode = id !== null;
+        // リクエストメソッドとURLを設定
         const method = isEditMode ? "PUT" : "POST";
         const url = isEditMode ? `/api/infokanri/${id}` : "/api/infokanri";
         
