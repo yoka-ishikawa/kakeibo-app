@@ -187,6 +187,8 @@ document
         const userToken = localStorage.getItem("userToken");
         
         // 編集モードの場合はPUT、新規登録の場合はPOST
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
         const isEditMode = id !== null;
         const method = isEditMode ? "PUT" : "POST";
         const url = isEditMode ? `/api/infokanri/${id}` : "/api/infokanri";
