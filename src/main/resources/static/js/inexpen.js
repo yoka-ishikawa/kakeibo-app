@@ -77,7 +77,7 @@ function restoreFormDataFromURL() {
     const amountInput = document.getElementById("amount");
     if (amountInput) amountInput.value = amount; // 金額を設定
   }
-});
+};
 
 // ボタンを制御する関数
 function setupButtonControl() {
