@@ -7,153 +7,86 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
-import java.util.Properties;
 
 /**
- * データベース設定（緊急対応版・SSL問題解決）
- * Render PostgreSQL接続エラー "SSL/TLS required" 対応
+ * データベース設定（緊急対応・シンプル版）
+ * 複雑な段階的試行を一旦停止し、最もシンプルな設定でテスト
  */
 @Configuration
 @Profile("production")
 public class DatabaseConfig {
 
-    /**
-     * 段階的接続試行によるデータソース作成
-     * 1. SSL必須（証明書検証緩和）
-     * 2. SSL優先（証明書検証なし）
-     * 3. 最後の手段としてSSL無効
-     */
     @Bean
     public DataSource dataSource() {
-        System.out.println("=== データベース接続設定開始 ===");
+        System.out.println("=== シンプルデータベース接続設定 ===");
         
         // 環境変数から接続情報を取得
         String databaseUrl = System.getenv("DATABASE_URL");
         String username = System.getenv("DB_USERNAME");
         String password = System.getenv("DB_PASSWORD");
 
-        System.out.println("環境変数確認:");
-        System.out.println("  DATABASE_URL: " + databaseUrl);
-        System.out.println("  DB_USERNAME: " + username);
-        System.out.println("  DB_PASSWORD: " + (password != null ? "設定済み" : "未設定"));
-
-        // フォールバック設定（環境変数が未設定の場合）
-        if (databaseUrl == null) {
-            databaseUrl = "jdbc:postgresql://dpg-d12hm7je5dus7396aujg-a.singapore-postgres.render.com:5432/tb_info_kanri";
+        System.out.println("接続情報確認:");
+        System.out.println("  URL: " + databaseUrl);
+        System.out.println("  User: " + username);
+        System.out.println("  Pass: " + (password != null ? "設定済み" : "未設定"));
+        
+        // 環境変数が不正な場合の対応
+        if (databaseUrl == null || username == null || password == null) {
+            String error = "❌ 環境変数が不完全です:\n" +
+                          "  DATABASE_URL: " + (databaseUrl != null ? "設定済み" : "未設定") + "\n" +
+                          "  DB_USERNAME: " + (username != null ? "設定済み" : "未設定") + "\n" +
+                          "  DB_PASSWORD: " + (password != null ? "設定済み" : "未設定");
+            System.err.println(error);
+            throw new RuntimeException("データベース環境変数が設定されていません。Renderの設定を確認してください。");
         }
 
-        // ユーザー名のフォールバック: ログから確認された実際の値に合わせる
-        if (username == null) {
-            username = "kakeibo_user"; // ログから確認された実際の値
-        }
-
-        // 段階的接続試行: 1. SSL必須（証明書検証緩和）
-        DataSource dataSource = trySSLConnection(databaseUrl, username, password, "require");
-        if (dataSource != null) return dataSource;
-
-        // 段階的接続試行: 2. SSL優先（証明書検証なし）
-        dataSource = trySSLConnection(databaseUrl, username, password, "prefer");
-        if (dataSource != null) return dataSource;
-
-        // 段階的接続試行: 3. SSL無効（最後の手段）
-        System.out.println("⚠️ 警告: SSL無効で接続を試行します（セキュリティリスクあり）");
-        dataSource = trySSLConnection(databaseUrl, username, password, "disable");
-        if (dataSource != null) return dataSource;
-
-        throw new RuntimeException("すべての接続試行が失敗しました。データベースサーバーの状態を確認してください。");
-    }
-
-    /**
-     * SSL設定を指定して接続を試行
-     */
-    private DataSource trySSLConnection(String baseUrl, String username, String password, String sslMode) {
         try {
-            System.out.println("=== 接続試行: SSL " + sslMode + " ===");
-            
             HikariConfig config = new HikariConfig();
             
-            // URL構築（既存のパラメータを削除）
-            String url = baseUrl;
-            if (url.contains("?")) {
-                url = url.substring(0, url.indexOf("?"));
-            }
-            
-            // SSL設定に応じてパラメータを追加
-            switch (sslMode) {
-                case "require":
-                    // SSL必須だが証明書検証を緩和
-                    url += "?sslmode=require&sslcert=&sslkey=&sslrootcert=" +
-                           "&connectTimeout=60&socketTimeout=60&tcpKeepAlive=true" +
-                           "&ApplicationName=kakeibo-app&assumeMinServerVersion=9.0";
-                    break;
-                case "prefer":
-                    // SSL優先（利用可能なら使用、不可能なら平文）
-                    url += "?sslmode=prefer&connectTimeout=60&socketTimeout=60" +
-                           "&tcpKeepAlive=true&ApplicationName=kakeibo-app" +
-                           "&assumeMinServerVersion=9.0";
-                    break;
-                case "disable":
-                    // SSL無効（最後の手段）
-                    url += "?sslmode=disable&connectTimeout=60&socketTimeout=60" +
-                           "&tcpKeepAlive=true&ApplicationName=kakeibo-app" +
-                           "&assumeMinServerVersion=9.0";
-                    break;
-            }
-            
-            config.setJdbcUrl(url);
+            // 最もシンプルな設定
+            config.setJdbcUrl(databaseUrl);
             config.setUsername(username);
             config.setPassword(password);
             config.setDriverClassName("org.postgresql.Driver");
             
-            // 保守的な接続プール設定
-            config.setMaximumPoolSize(2);
+            // 最小限のプール設定
+            config.setMaximumPoolSize(1);
             config.setMinimumIdle(1);
-            config.setConnectionTimeout(45000); // 45秒
-            config.setIdleTimeout(300000); // 5分
-            config.setMaxLifetime(600000); // 10分
-            config.setValidationTimeout(15000); // 15秒
-            config.setInitializationFailTimeout(45000); // 45秒
-            config.setConnectionTestQuery("SELECT 1");
+            config.setConnectionTimeout(30000); // 30秒
+            config.setValidationTimeout(10000); // 10秒
+            config.setInitializationFailTimeout(60000); // 1分
             
-            // データソースプロパティ設定
-            Properties props = new Properties();
-            props.setProperty("connectTimeout", "60");
-            props.setProperty("socketTimeout", "60");
-            props.setProperty("tcpKeepAlive", "true");
-            props.setProperty("ApplicationName", "kakeibo-app");
-            props.setProperty("assumeMinServerVersion", "9.0");
-            
-            if ("require".equals(sslMode)) {
-                props.setProperty("sslmode", "require");
-                props.setProperty("sslcert", "");
-                props.setProperty("sslkey", "");
-                props.setProperty("sslrootcert", "");
-            } else if ("prefer".equals(sslMode)) {
-                props.setProperty("sslmode", "prefer");
-            } else {
-                props.setProperty("sslmode", "disable");
-            }
-            config.setDataSourceProperties(props);
-            
-            System.out.println("接続URL: " + url);
-            System.out.println("接続試行中...");
-            
+            System.out.println("データソース作成試行中...");
             HikariDataSource dataSource = new HikariDataSource(config);
             
-            // 接続テスト
+            System.out.println("接続テスト実行中...");
             try (var conn = dataSource.getConnection()) {
-                System.out.println("✅ 接続成功: SSL " + sslMode);
-                System.out.println("PostgreSQL バージョン: " + conn.getMetaData().getDatabaseProductVersion());
-                System.out.println("接続情報: " + conn.getMetaData().getURL());
+                System.out.println("✅ データベース接続成功！");
+                var metadata = conn.getMetaData();
+                System.out.println("  製品名: " + metadata.getDatabaseProductName());
+                System.out.println("  バージョン: " + metadata.getDatabaseProductVersion());
+                System.out.println("  URL: " + metadata.getURL());
                 return dataSource;
             }
             
         } catch (Exception e) {
-            System.err.println("❌ 接続失敗 (SSL " + sslMode + "): " + e.getMessage());
+            System.err.println("❌ データベース接続失敗:");
+            System.err.println("  エラータイプ: " + e.getClass().getSimpleName());
+            System.err.println("  エラーメッセージ: " + e.getMessage());
+            
             if (e.getCause() != null) {
-                System.err.println("根本原因: " + e.getCause().getClass().getSimpleName() + " - " + e.getCause().getMessage());
+                System.err.println("  根本原因: " + e.getCause().getClass().getSimpleName());
+                System.err.println("  根本原因メッセージ: " + e.getCause().getMessage());
             }
-            return null;
+            
+            // スタックトレースの最初の数行のみ表示
+            StackTraceElement[] stackTrace = e.getStackTrace();
+            System.err.println("  スタックトレース（抜粋）:");
+            for (int i = 0; i < Math.min(5, stackTrace.length); i++) {
+                System.err.println("    " + stackTrace[i]);
+            }
+            
+            throw new RuntimeException("データベース接続に失敗しました。詳細は上記ログを確認してください。", e);
         }
     }
 }
