@@ -234,7 +234,23 @@ document
           throw new Error(
             `登録に失敗しました。ステータス: ${response.status}, メッセージ: ${errorText}`
           );
-        } // 登録/更新成功時の処理
+        }
+
+        // レスポンスの詳細情報をログ出力
+        console.log("レスポンス詳細:", {
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers,
+          ok: response.ok,
+        });
+
+        // レスポンスの生テキストを確認
+        const responseClone = response.clone();
+        const responseText = await responseClone.text();
+        console.log("レスポンス生テキスト:", responseText);
+        console.log("レスポンステキスト長:", responseText.length);
+
+        // 登録/更新成功時の処理
         let result;
         try {
           result = await response.json();
@@ -248,6 +264,7 @@ document
           console.log(isEditMode ? "更新成功:" : "登録成功:", result);
         } catch (parseError) {
           console.error("レスポンス解析エラー:", parseError);
+          console.error("レスポンステキスト:", responseText);
           throw new Error(
             (isEditMode ? "更新" : "登録") + "の処理中に問題が発生しました"
           );

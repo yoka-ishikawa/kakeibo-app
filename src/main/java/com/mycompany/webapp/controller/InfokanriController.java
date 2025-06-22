@@ -2,7 +2,9 @@ package com.mycompany.webapp.controller;
 
 import com.mycompany.webapp.model.Infokanri;
 import com.mycompany.webapp.service.InfokanriService;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,19 +28,39 @@ public class InfokanriController {
    * @return 登録された収支データ（IDを含む）
    */
   @PostMapping(produces = "application/json")
-  public ResponseEntity<Infokanri> add(
-      @RequestBody Infokanri infokanri,
+  public ResponseEntity<String> add(@RequestBody Infokanri infokanri,
       @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
-    System.out.println("=== 収支データ登録 ===");
+    System.out.println("=== 収支データ登録開始 ===");
     System.out.println("User ID: " + userId);
     System.out.println("受信データ: " + infokanri.toString());
 
-    infokanri.setUserId(userId);
-    Infokanri savedData = service.saveInfokanri(infokanri);
+    try {
+      infokanri.setUserId(userId);
+      System.out.println("UserID設定完了");
 
-    System.out.println("保存されたデータ: " + savedData.toString());
-    System.out.println("レスポンス送信: " + savedData.toString());
-    return ResponseEntity.ok().header("Content-Type", "application/json").body(savedData);
+      Infokanri savedData = service.saveInfokanri(infokanri);
+      System.out.println("データベース保存完了");
+      System.out.println("保存されたデータ: " + savedData.toString());
+
+      // 一時的にシンプルなJSONレスポンスを返す
+      String jsonResponse = String.format(
+          "{\"id\": %d, \"userId\": \"%s\", \"syubetu\": \"%s\", \"kingaku\": %d, \"naisyo\": \"%s\", \"hiduke\": \"%s\"}",
+          savedData.getId(), savedData.getUserId(), savedData.getSyubetu(), savedData.getKingaku(),
+          savedData.getNaisyo(), savedData.getHiduke().toString());
+
+      System.out.println("手動JSON生成完了: " + jsonResponse);
+
+      return ResponseEntity.ok().header("Content-Type", "application/json").body(jsonResponse);
+
+    } catch (Exception e) {
+      System.err.println("=== エラー発生 ===");
+      System.err.println("エラー内容: " + e.getMessage());
+      e.printStackTrace();
+
+      // エラー時のレスポンス
+      return ResponseEntity.internalServerError().header("Content-Type", "application/json")
+          .body("{\"error\": \"データ登録に失敗しました\"}");
+    }
   }
 
   /**
@@ -76,8 +98,7 @@ public class InfokanriController {
    * @return 更新された収支データ
    */
   @PutMapping(value = "/{id}", produces = "application/json")
-  public ResponseEntity<Infokanri> updateData(
-      @PathVariable Long id,
+  public ResponseEntity<Infokanri> updateData(@PathVariable Long id,
       @RequestBody Infokanri infokanri,
       @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
     System.out.println("=== 収支データ更新 ===");
@@ -102,10 +123,36 @@ public class InfokanriController {
    * @return フィルタリングされた収支データのリスト
    */
   @GetMapping("/report")
-  public List<Infokanri> getReportData(
-      @RequestParam(required = false) String period,
+  public List<Infokanri> getReportData(@RequestParam(required = false) String period,
       @RequestParam(required = false) String startDate,
       @RequestParam(required = false) String endDate) {
     return service.getReportData(period, startDate, endDate);
+  }
+
+  /**
+   * データベース接続テスト用エンドポイント
+   * 
+   * @return データベース接続状況
+   */
+  @GetMapping("/health")
+  public ResponseEntity<Map<String, Object>> healthCheck() {
+    Map<String, Object> health = new HashMap<>();
+    try {
+      // データベースから件数を取得してテスト
+      List<Infokanri> testData = service.getAllInfokanri();
+      health.put("status", "OK");
+      health.put("database", "Connected");
+      health.put("recordCount", testData.size());
+      health.put("timestamp", java.time.LocalDateTime.now().toString());
+
+      return ResponseEntity.ok().header("Content-Type", "application/json").body(health);
+    } catch (Exception e) {
+      health.put("status", "ERROR");
+      health.put("database", "Connection Failed");
+      health.put("error", e.getMessage());
+      health.put("timestamp", java.time.LocalDateTime.now().toString());
+
+      return ResponseEntity.status(500).header("Content-Type", "application/json").body(health);
+    }
   }
 }
