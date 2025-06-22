@@ -21,18 +21,16 @@ public class InfokanriController {
      */
     public InfokanriController(InfokanriService service) {
         this.service = service;
-    }
-
-    /**
+    }    /**
      * 新しい収支データを登録
      * @param infokanri 登録する収支データ
-     * @param userToken ユーザー識別トークン（リクエストヘッダーから取得）
+     * @param userId ユーザーID（リクエストヘッダーから取得）
      * @return 登録された収支データ（IDを含む）
      */
     @PostMapping
     public Infokanri add(@RequestBody Infokanri infokanri,
-            @RequestHeader("X-User-Token") String userToken) {
-        infokanri.setUserToken(userToken);
+            @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
+        infokanri.setUserId(userId);
         return service.saveInfokanri(infokanri);
     }
 
@@ -58,20 +56,18 @@ public class InfokanriController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    /**
+    }    /**
      * 既存の収支データを更新
      * @param id 更新対象のデータID
      * @param infokanri 更新内容
-     * @param userToken ユーザー識別トークン
+     * @param userId ユーザーID
      * @return 更新された収支データ
      */
     @PutMapping("/{id}")
     public Infokanri updateData(@PathVariable Long id, @RequestBody Infokanri infokanri,
-            @RequestHeader("X-User-Token") String userToken) {
+            @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
         infokanri.setId(id);
-        infokanri.setUserToken(userToken);
+        infokanri.setUserId(userId);
         return service.updateInfokanri(infokanri);
     }
 
