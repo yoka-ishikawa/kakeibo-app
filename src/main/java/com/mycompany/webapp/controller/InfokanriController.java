@@ -26,8 +26,7 @@ public class InfokanriController {
    * @param infokanri 登録する収支データ
    * @param userId ユーザーID（リクエストヘッダーから取得）
    * @return 登録された収支データ（IDを含む）
-   */
-  @PostMapping(produces = "application/json")
+   */  @PostMapping(produces = "application/json")
   public ResponseEntity<String> add(@RequestBody Infokanri infokanri,
       @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
     System.out.println("=== 収支データ登録開始 ===");
@@ -38,9 +37,36 @@ public class InfokanriController {
       infokanri.setUserId(userId);
       System.out.println("UserID設定完了");
 
-      Infokanri savedData = service.saveInfokanri(infokanri);
-      System.out.println("データベース保存完了");
-      System.out.println("保存されたデータ: " + savedData.toString());
+      // データベース接続再試行ロジック
+      Infokanri savedData = null;
+      int retryCount = 0;
+      int maxRetries = 3;
+      
+      while (retryCount < maxRetries) {
+        try {
+          System.out.println("データベース保存試行: " + (retryCount + 1) + "/" + maxRetries);
+          savedData = service.saveInfokanri(infokanri);
+          System.out.println("データベース保存完了");
+          System.out.println("保存されたデータ: " + savedData.toString());
+          break; // 成功した場合、ループを抜ける
+          
+        } catch (Exception dbException) {
+          retryCount++;
+          System.err.println("データベース接続エラー (試行 " + retryCount + "/" + maxRetries + "): " + dbException.getMessage());
+          
+          if (retryCount >= maxRetries) {
+            throw dbException; // 最大試行回数に達した場合、例外を再スロー
+          }
+          
+          // 再試行前に少し待機
+          try {
+            Thread.sleep(2000); // 2秒待機
+          } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("再試行待機中に中断されました", ie);
+          }
+        }
+      }
 
       // 一時的にシンプルなJSONレスポンスを返す
       String jsonResponse = String.format(
@@ -57,9 +83,15 @@ public class InfokanriController {
       System.err.println("エラー内容: " + e.getMessage());
       e.printStackTrace();
 
+      // データベース接続エラーの詳細情報を含める
+      String errorMessage = "データベース接続に失敗しました";
+      if (e.getMessage().contains("connection")) {
+        errorMessage = "データベースサーバーに接続できません。しばらく待ってから再試行してください。";
+      }
+
       // エラー時のレスポンス
       return ResponseEntity.internalServerError().header("Content-Type", "application/json")
-          .body("{\"error\": \"データ登録に失敗しました\"}");
+          .body("{\"error\": \"" + errorMessage + "\", \"details\": \"" + e.getMessage() + "\"}");
     }
   }
 
