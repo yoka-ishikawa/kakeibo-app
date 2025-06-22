@@ -1,4 +1,4 @@
-﻿package com.mycompany.webapp.config;
+package com.mycompany.webapp.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * データベース設定（改良版・詳細エラーハンドリング付き） 
+ * データベース設定（改良版・詳細エラーハンドリング付き）
  * 環境変数の詳細チェックと段階的接続試行
  * JDBC URL認証情報の自動変換機能付き
  */
@@ -60,12 +60,14 @@ public class DatabaseConfig {
 
         // DATABASE_URLプロトコル自動修正
         databaseUrl = fixDatabaseUrlProtocol(databaseUrl);
-        
+
         // JDBC URL認証情報の自動変換
         String[] credentials = extractAndFixCredentials(databaseUrl);
         databaseUrl = credentials[0]; // 修正されたURL
-        if (credentials[1] != null) username = credentials[1]; // 抽出されたユーザー名
-        if (credentials[2] != null) password = credentials[2]; // 抽出されたパスワード
+        if (credentials[1] != null)
+            username = credentials[1]; // 抽出されたユーザー名
+        if (credentials[2] != null)
+            password = credentials[2]; // 抽出されたパスワード
 
         if (username == null || username.trim().isEmpty()) {
             String errorMsg =
@@ -85,77 +87,67 @@ public class DatabaseConfig {
     }
 
     /**
-     * JDBC URLから認証情報を抽出し、標準形式に変換する
-     * user:pass@host:port/db → host:port/db + 別途認証情報
+     * JDBC URLから認証情報を抽出し、標準形式に変換する user:pass@host:port/db → host:port/db + 別途認証情報
      */
     private String[] extractAndFixCredentials(String url) {
         try {
             // 既にJDBC標準形式（認証情報が含まれていない）の場合はそのまま返す
-            if (!url.contains("@") || url.startsWith("jdbc:postgresql://") && !url.matches(".*://[^@]+:[^@]+@.*")) {
-                return new String[]{url, null, null};
+            if (!url.contains("@") || url.startsWith("jdbc:postgresql://")
+                    && !url.matches(".*://[^@]+:[^@]+@.*")) {
+                return new String[] {url, null, null};
             }
 
             // user:pass@host形式を検出・変換
             Pattern pattern = Pattern.compile("(.*)://([^:]+):([^@]+)@(.+)");
             Matcher matcher = pattern.matcher(url);
-            
+
             if (matcher.matches()) {
                 String protocol = matcher.group(1);
                 String user = matcher.group(2);
                 String pass = matcher.group(3);
                 String hostAndDb = matcher.group(4);
-                
+
                 String fixedUrl = protocol + "://" + hostAndDb;
-                
+
                 logger.info("JDBC URL認証情報を標準形式に変換:");
                 logger.info("変換前: {}://{}:***@{}", protocol, user, hostAndDb);
                 logger.info("変換後: {}", fixedUrl);
                 logger.info("抽出されたユーザー名: {}", user);
-                
+
                 // LINE通知でJDBC URL変換を報告
                 sendJdbcUrlConversionNotification(user, hostAndDb, fixedUrl);
-                
-                return new String[]{fixedUrl, user, pass};
+
+                return new String[] {fixedUrl, user, pass};
             }
-            
-            return new String[]{url, null, null};
-            
+
+            return new String[] {url, null, null};
+
         } catch (Exception e) {
             logger.error("JDBC URL認証情報の変換中にエラー: {}", e.getMessage());
-            return new String[]{url, null, null};
+            return new String[] {url, null, null};
         }
     }
 
     /**
      * JDBC URL変換の通知を送信
      */
-    private void sendJdbcUrlConversionNotification(String username, String hostAndDb, String fixedUrl) {
+    private void sendJdbcUrlConversionNotification(String username, String hostAndDb,
+            String fixedUrl) {
         try {
             // Flexメッセージで通知
-            notificationService.sendConnectionErrorDetails(
-                "JDBC URL自動変換",
-                String.format("認証情報をJDBC標準形式に変換: %s → %s", username + "@" + hostAndDb, fixedUrl),
-                fixedUrl
-            );
+            notificationService.sendConnectionErrorDetails("JDBC URL自動変換", String.format(
+                    "認証情報をJDBC標準形式に変換: %s → %s", username + "@" + hostAndDb, fixedUrl), fixedUrl);
         } catch (Exception e) {
             logger.warn("JDBC URL変換のFlex通知に失敗、テキスト通知を送信: {}", e.getMessage());
-            
+
             // Flexメッセージが失敗した場合はテキスト通知
             try {
                 String message = String.format(
-                    "🔧 JDBC URL自動変換完了\n\n" +
-                    "📊 変換内容:\n" +
-                    "• ユーザー名: %s\n" +
-                    "• 接続先: %s\n" +
-                    "• 新URL: %s\n\n" +
-                    "⚡ 認証情報をJDBC標準形式に変換しました",
-                    username, hostAndDb, fixedUrl
-                );
-                notificationService.sendConnectionErrorDetails(
-                    "JDBC URL変換テキスト通知", 
-                    message,
-                    fixedUrl
-                );
+                        "🔧 JDBC URL自動変換完了\n\n" + "📊 変換内容:\n" + "• ユーザー名: %s\n" + "• 接続先: %s\n"
+                                + "• 新URL: %s\n\n" + "⚡ 認証情報をJDBC標準形式に変換しました",
+                        username, hostAndDb, fixedUrl);
+                notificationService.sendConnectionErrorDetails("JDBC URL変換テキスト通知", message,
+                        fixedUrl);
             } catch (Exception ex) {
                 logger.error("JDBC URL変換のテキスト通知も失敗: {}", ex.getMessage());
             }
