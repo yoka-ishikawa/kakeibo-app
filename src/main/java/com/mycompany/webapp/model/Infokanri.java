@@ -14,141 +14,134 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * 家計簿情報管理エンティティ
- * Supabaseのtb_info_kanriテーブルにマッピング
+ * 家計簿情報管理エンティティ Supabaseのtb_info_kanriテーブルにマッピング
  */
 @Entity
 @Table(name = "tb_info_kanri")
 public class Infokanri {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(name = "user_id")
-    private String userId;
-    
-    @Column(name = "syubetu", nullable = false, length = 50)
-    private String syubetu;
-    
-    @Column(name = "kingaku", nullable = false)
-    private Integer kingaku;
-    
-    @Column(name = "naisyo")
-    private String naisyo;
-      @Column(name = "hiduke", nullable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate hiduke;
-    
-    @Column(name = "created_at")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
-    
-    @Column(name = "updated_at")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedAt;
 
-    // ライフサイクルメソッド
-    @PrePersist
-    protected void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now;
-    }
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
+  @Column(name = "user_id")
+  private String userId;
 
-    // デフォルトコンストラクタ
-    public Infokanri() {}
+  @Column(name = "syubetu", nullable = false, length = 50)
+  private String syubetu;
 
-    // 引数付きコンストラクタ
-    public Infokanri(String userId, String syubetu, Integer kingaku, String naisyo, LocalDate hiduke) {
-        this.userId = userId;
-        this.syubetu = syubetu;
-        this.kingaku = kingaku;
-        this.naisyo = naisyo;
-        this.hiduke = hiduke;
-    }
+  @Column(name = "kingaku", nullable = false)
+  private Integer kingaku;
 
-    // Getter/Setter
-    public Long getId() {
-        return id;
-    }
+  @Column(name = "naisyo")
+  private String naisyo;
+  @Column(name = "hiduke", nullable = false)
+  @JsonFormat(pattern = "yyyy-MM-dd")
+  private LocalDate hiduke;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  @Column(name = "created_at")
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+  private LocalDateTime createdAt;
 
-    public String getUserId() {
-        return userId;
-    }
+  @Column(name = "updated_at")
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+  private LocalDateTime updatedAt;
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+  // ライフサイクルメソッド
+  @PrePersist
+  protected void onCreate() {
+    LocalDateTime now = LocalDateTime.now();
+    this.createdAt = now;
+    this.updatedAt = now;
+  }
 
-    public String getSyubetu() {
-        return syubetu;
-    }
+  @PreUpdate
+  protected void onUpdate() {
+    this.updatedAt = LocalDateTime.now();
+  }
 
-    public void setSyubetu(String syubetu) {
-        this.syubetu = syubetu;
-    }
+  // デフォルトコンストラクタ
+  public Infokanri() {}
 
-    public Integer getKingaku() {
-        return kingaku;
-    }
+  // 引数付きコンストラクタ
+  public Infokanri(String userId, String syubetu, Integer kingaku, String naisyo,
+      LocalDate hiduke) {
+    this.userId = userId;
+    this.syubetu = syubetu;
+    this.kingaku = kingaku;
+    this.naisyo = naisyo;
+    this.hiduke = hiduke;
+  }
 
-    public void setKingaku(Integer kingaku) {
-        this.kingaku = kingaku;
-    }
+  // Getter/Setter
+  public Long getId() {
+    return id;
+  }
 
-    public String getNaisyo() {
-        return naisyo;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public void setNaisyo(String naisyo) {
-        this.naisyo = naisyo;
-    }
+  public String getUserId() {
+    return userId;
+  }
 
-    public LocalDate getHiduke() {
-        return hiduke;
-    }
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
 
-    public void setHiduke(LocalDate hiduke) {
-        this.hiduke = hiduke;
-    }
+  public String getSyubetu() {
+    return syubetu;
+  }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+  public void setSyubetu(String syubetu) {
+    this.syubetu = syubetu;
+  }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+  public Integer getKingaku() {
+    return kingaku;
+  }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+  public void setKingaku(Integer kingaku) {
+    this.kingaku = kingaku;
+  }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+  public String getNaisyo() {
+    return naisyo;
+  }
 
-    @Override
-    public String toString() {
-        return "Infokanri{" +
-                "id=" + id +
-                ", userId='" + userId + '\'' +
-                ", syubetu='" + syubetu + '\'' +
-                ", kingaku=" + kingaku +
-                ", naisyo='" + naisyo + '\'' +
-                ", hiduke=" + hiduke +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
+  public void setNaisyo(String naisyo) {
+    this.naisyo = naisyo;
+  }
+
+  public LocalDate getHiduke() {
+    return hiduke;
+  }
+
+  public void setHiduke(LocalDate hiduke) {
+    this.hiduke = hiduke;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
+  @Override
+  public String toString() {
+    return "Infokanri{" + "id=" + id + ", userId='" + userId + '\'' + ", syubetu='" + syubetu + '\''
+        + ", kingaku=" + kingaku + ", naisyo='" + naisyo + '\'' + ", hiduke=" + hiduke
+        + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+  }
 }

@@ -25,8 +25,8 @@ document.addEventListener("DOMContentLoaded", function () {
 function initializeUserToken() {
   if (!localStorage.getItem("userToken")) {
     fetch("/api/user/token")
-      .then((response) => response.json())
-      .then((data) => {
+      .then(response => response.json())
+      .then(data => {
         localStorage.setItem("userToken", data.userToken);
       })
       .catch(() => {
@@ -42,7 +42,7 @@ function initializeUserToken() {
  */
 function restoreFormDataFromURL() {
   const params = new URLSearchParams(window.location.search);
-  
+
   const id = params.get("id");
   const date = params.get("date");
   const type = params.get("type");
@@ -77,7 +77,7 @@ function restoreFormDataFromURL() {
     const amountInput = document.getElementById("amount");
     if (amountInput) amountInput.value = amount; // 金額を設定
   }
-};
+}
 
 // ボタンを制御する関数
 function setupButtonControl() {
@@ -86,7 +86,7 @@ function setupButtonControl() {
 
   function checkInputs() {
     let allFilled = true;
-    inputs.forEach((input) => {
+    inputs.forEach(input => {
       if (input.value.trim() === "") {
         allFilled = false;
       }
@@ -107,7 +107,7 @@ function setupButtonControl() {
   checkInputs();
 
   // 入力値変更時にボタン状態を再チェック
-  inputs.forEach((input) => {
+  inputs.forEach(input => {
     input.addEventListener("input", checkInputs);
     input.addEventListener("change", checkInputs);
   });
@@ -159,7 +159,7 @@ function updateDropdown(selectedValue) {
   dropdown.appendChild(placeholder);
 
   // 選択された値に応じたオプションを追加
-  options[selectedValue].forEach((item) => {
+  options[selectedValue].forEach(item => {
     const option = document.createElement("option");
     option.value = item;
     option.textContent = item;
@@ -184,9 +184,7 @@ document
       const selectedOption = document.querySelector(
         'input[name="type"]:checked'
       ); // 収入か支出か
-      const incomeOrExpenditure = selectedOption
-        ? selectedOption.value
-        : null; // "income" または "expenditure" を取得
+      const incomeOrExpenditure = selectedOption ? selectedOption.value : null; // "income" または "expenditure" を取得
 
       const categorySelect = document.getElementById("category"); // カテゴリ
       const category =
@@ -197,13 +195,13 @@ document
       const params = new URLSearchParams(window.location.search);
       const id = params.get("id");
       const isEditMode = id !== null;
-        // 収支登録またはAPIにリクエストを送信
+      // 収支登録またはAPIにリクエストを送信
       try {
         // リクエストペイロードを作成（新しいテーブル構造に対応）
         const payload = {
-          hiduke: date,           // registeredAt → hiduke
+          hiduke: date, // registeredAt → hiduke
           syubetu: incomeOrExpenditure === "income" ? "収入" : "支出", // type → syubetu (日本語)
-          naisyo: category,       // category → naisyo
+          naisyo: category, // category → naisyo
           kingaku: parseInt(amount, 10), // amount → kingaku
         };
         console.log("送信するデータ:", payload); // 送信するデータをログに出力
@@ -213,11 +211,11 @@ document
         if (!userId) {
           userId = "anonymous_user_" + Date.now();
           localStorage.setItem("userId", userId);
-        }        
+        }
         // リクエストメソッドとURLを設定
         const method = isEditMode ? "PUT" : "POST";
         const url = isEditMode ? `/api/infokanri/${id}` : "/api/infokanri";
-        
+
         const response = await fetch(url, {
           method: method,
           headers: {
@@ -225,39 +223,46 @@ document
             "X-User-Id": userId, // X-User-Token → X-User-Id
           },
           body: JSON.stringify(payload),
-        });        if (!response.ok) {
+        });
+        if (!response.ok) {
           const errorText = await response.text();
           console.error("登録に失敗:", {
             status: response.status,
             statusText: response.statusText,
-            errorText: errorText
+            errorText: errorText,
           });
-          throw new Error(`登録に失敗しました。ステータス: ${response.status}, メッセージ: ${errorText}`);
-        }
-
-        // 登録/更新成功時の処理
-        const responseText = await response.text();
-        console.log("サーバーレスポンス:", responseText);
-        
+          throw new Error(
+            `登録に失敗しました。ステータス: ${response.status}, メッセージ: ${errorText}`
+          );
+        } // 登録/更新成功時の処理
         let result;
-        if (responseText) {
-          try {
-            result = JSON.parse(responseText);
-          } catch (parseError) {
-            console.warn("JSONパースエラー:", parseError);
-            result = { message: responseText };
+        try {
+          result = await response.json();
+          console.log("サーバーレスポンス:", result);
+
+          // 成功レスポンスの検証
+          if (!result || !result.id) {
+            throw new Error("サーバーからの応答が不正です");
           }
-        } else {
-          result = { message: "登録が完了しました" };
+
+          console.log(isEditMode ? "更新成功:" : "登録成功:", result);
+        } catch (parseError) {
+          console.error("レスポンス解析エラー:", parseError);
+          throw new Error(
+            (isEditMode ? "更新" : "登録") + "の処理中に問題が発生しました"
+          );
         }
-        
-        console.log(isEditMode ? "更新成功:" : "登録成功:", result);
       } catch (error) {
         console.error(isEditMode ? "更新エラー:" : "登録エラー:", error);
-        alert((isEditMode ? "更新" : "登録") + "中にエラーが発生しました。");
+        alert(
+          (isEditMode ? "更新" : "登録") +
+            "中にエラーが発生しました: " +
+            error.message
+        );
         return; // エラーが発生した場合は処理を中断
       }
 
+      // ここまで到達した場合のみ成功処理を実行
       // フォームをクリア（新規登録の場合のみ）
       if (!isEditMode) {
         setDateValues(); // 日付を今日の日付にリセット
@@ -266,9 +271,9 @@ document
         setupButtonControl(); // 登録ボタンの制御を設定
       }
 
-      // 完了ポップアップを表示
+      // 成功ポップアップを表示（成功が確認された場合のみ）
       alert((isEditMode ? "更新" : "登録") + "が完了しました！");
-      
+
       // 編集モードの場合は一覧画面に戻る
       if (isEditMode) {
         window.location.href = "list.html";

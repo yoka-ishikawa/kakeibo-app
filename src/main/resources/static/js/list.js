@@ -7,22 +7,30 @@ document.addEventListener("DOMContentLoaded", function () {
 async function loadDataList() {
   try {
     const response = await fetch("/api/infokanri");
+
+    if (!response.ok) {
+      throw new Error(
+        `データ取得に失敗しました。ステータス: ${response.status}`
+      );
+    }
+
     const data = await response.json();
-    
+
     const tbody = document.querySelector("tbody");
     tbody.innerHTML = ""; // 既存のデータをクリア
 
     if (data.length === 0) {
       tbody.innerHTML = '<tr><td colspan="5">データがありません</td></tr>';
       return;
-    }    data.forEach((item) => {
+    }
+    data.forEach(item => {
       const row = document.createElement("tr");
       row.dataset.id = item.id;
-      
+
       // 新しいテーブル構造に対応
       const typeText = item.syubetu; // 既に日本語で格納されている
       const amountText = item.kingaku.toLocaleString() + "円"; // amount → kingaku
-      
+
       row.innerHTML = `
         <td class="date-cell">${item.hiduke}</td>         
         <td class="type-cell">${typeText}</td>
@@ -35,7 +43,7 @@ async function loadDataList() {
           </div>
         </td>
       `;
-      
+
       tbody.appendChild(row);
     });
 
@@ -50,12 +58,15 @@ async function loadDataList() {
 // イベントリスナーを設定する関数
 function setupEventListeners() {
   // 編集ボタンの処理
-  document.querySelectorAll(".edit-button").forEach((button) => {
+  document.querySelectorAll(".edit-button").forEach(button => {
     button.addEventListener("click", function () {
       const row = this.closest("tr");
       const id = row.dataset.id;
       const date = row.querySelector(".date-cell").textContent.trim();
-      const type = row.querySelector(".type-cell").textContent === "収入" ? "income" : "expenditure";
+      const type =
+        row.querySelector(".type-cell").textContent === "収入"
+          ? "income"
+          : "expenditure";
       const category = row.querySelector(".category-cell").textContent.trim();
       const amount = row
         .querySelector(".amount-cell")
@@ -77,7 +88,7 @@ function setupEventListeners() {
   });
 
   // 削除ボタンの処理
-  document.querySelectorAll(".delete-button").forEach((button) => {
+  document.querySelectorAll(".delete-button").forEach(button => {
     button.addEventListener("click", async function () {
       const row = this.closest("tr");
       const id = row.dataset.id;
@@ -89,15 +100,18 @@ function setupEventListeners() {
             method: "DELETE",
           });
 
-          if (response.ok) {
-            row.remove();
-            alert("削除が完了しました。");
-          } else {
-            alert("削除に失敗しました。");
+          if (!response.ok) {
+            throw new Error(
+              `削除に失敗しました。ステータス: ${response.status}`
+            );
           }
+
+          // 削除成功時のみ実行
+          row.remove();
+          alert("削除が完了しました。");
         } catch (error) {
           console.error("削除エラー:", error);
-          alert("削除中にエラーが発生しました。");
+          alert("削除中にエラーが発生しました: " + error.message);
         }
       } else {
         alert("削除がキャンセルされました。");

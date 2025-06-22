@@ -23,11 +23,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   // レポートを表示ボタンをクリックした時の処理
   const reportButton = document.getElementById("displayButton");
-
   reportButton.addEventListener("click", async function () {
     try {
       // レポートデータを取得
       const response = await fetch("/api/infokanri/report");
+
+      if (!response.ok) {
+        throw new Error(
+          `レポートデータ取得に失敗しました。ステータス: ${response.status}`
+        );
+      }
+
       const data = await response.json();
 
       // レポートエリアを表示
@@ -35,10 +41,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // 収支を計算
       let totalIncome = 0;
-      let totalExpenditure = 0;      data.forEach((item) => {
-        if (item.syubetu === "収入") {      // type → syubetu, "income" → "収入"
-          totalIncome += item.kingaku;      // amount → kingaku
-        } else if (item.syubetu === "支出") { // type → syubetu, "expenditure" → "支出"
+      let totalExpenditure = 0;
+      data.forEach(item => {
+        if (item.syubetu === "収入") {
+          // type → syubetu, "income" → "収入"
+          totalIncome += item.kingaku; // amount → kingaku
+        } else if (item.syubetu === "支出") {
+          // type → syubetu, "expenditure" → "支出"
           totalExpenditure += item.kingaku; // amount → kingaku
         }
       });
@@ -46,9 +55,15 @@ document.addEventListener("DOMContentLoaded", function () {
       const balance = totalIncome - totalExpenditure;
 
       // レポート表示を更新
-      document.querySelector(".income").textContent = `収入: ¥ ${totalIncome.toLocaleString()}`;
-      document.querySelector(".expenditure").textContent = `支出: ¥ ${totalExpenditure.toLocaleString()}`;
-      document.querySelector(".income-expenditure").textContent = `収支: ¥ ${balance.toLocaleString()}`;
+      document.querySelector(
+        ".income"
+      ).textContent = `収入: ¥ ${totalIncome.toLocaleString()}`;
+      document.querySelector(
+        ".expenditure"
+      ).textContent = `支出: ¥ ${totalExpenditure.toLocaleString()}`;
+      document.querySelector(
+        ".income-expenditure"
+      ).textContent = `収支: ¥ ${balance.toLocaleString()}`;
 
       // テーブルを更新
       const tbody = document.querySelector("tbody");
@@ -58,22 +73,20 @@ document.addEventListener("DOMContentLoaded", function () {
         tbody.innerHTML = '<tr><td colspan="4">データがありません</td></tr>';
         return;
       }
-
-      data.forEach((item) => {
+      data.forEach(item => {
         const row = document.createElement("tr");
-        const typeText = item.type === "income" ? "収入" : "支出";
-        const amountText = item.amount.toLocaleString() + "円";
+        const typeText = item.syubetu; // 修正: item.type → item.syubetu
+        const amountText = item.kingaku.toLocaleString() + "円"; // 修正: item.amount → item.kingaku
 
         row.innerHTML = `
-          <td>${item.registeredAt}</td>
+          <td>${item.hiduke}</td>
           <td>${typeText}</td>
-          <td>${item.category}</td>
+          <td>${item.naisyo}</td>
           <td>${amountText}</td>
         `;
 
         tbody.appendChild(row);
       });
-
     } catch (error) {
       console.error("レポートデータ取得エラー:", error);
       alert("レポートデータの取得に失敗しました。");

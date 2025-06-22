@@ -20,7 +20,9 @@ public class InfokanriController {
      */
     public InfokanriController(InfokanriService service) {
         this.service = service;
-    }    /**
+    }
+
+    /**
      * 新しい収支データを登録
      * 
      * @param infokanri 登録する収支データ
@@ -39,9 +41,7 @@ public class InfokanriController {
 
         System.out.println("保存されたデータ: " + savedData.toString());
         System.out.println("レスポンス送信: " + savedData.toString());
-        return ResponseEntity.ok()
-                .header("Content-Type", "application/json")
-                .body(savedData);
+        return ResponseEntity.ok().header("Content-Type", "application/json").body(savedData);
     }
 
     /**
@@ -68,7 +68,9 @@ public class InfokanriController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-    }    /**
+    }
+
+    /**
      * 既存の収支データを更新
      * 
      * @param id 更新対象のデータID
@@ -90,9 +92,7 @@ public class InfokanriController {
         Infokanri updatedData = service.updateInfokanri(infokanri);
 
         System.out.println("更新されたデータ: " + updatedData.toString());
-        return ResponseEntity.ok()
-                .header("Content-Type", "application/json")
-                .body(updatedData);
+        return ResponseEntity.ok().header("Content-Type", "application/json").body(updatedData);
     }
 
     /**
