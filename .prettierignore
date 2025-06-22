@@ -1,0 +1,20 @@
+# Build directories
+target/
+node_modules/
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Log files
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md

@@ -10,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 家計簿情報管理エンティティ
@@ -34,14 +36,16 @@ public class Infokanri {
     
     @Column(name = "naisyo")
     private String naisyo;
-    
-    @Column(name = "hiduke", nullable = false)
+      @Column(name = "hiduke", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate hiduke;
     
     @Column(name = "created_at")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
     
     @Column(name = "updated_at")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
     // ライフサイクルメソッド

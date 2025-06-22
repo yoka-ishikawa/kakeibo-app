@@ -27,7 +27,7 @@ public class InfokanriController {
      * @param userId ユーザーID（リクエストヘッダーから取得）
      * @return 登録された収支データ（IDを含む）
      */
-    @PostMapping
+    @PostMapping(produces = "application/json")
     public ResponseEntity<Infokanri> add(@RequestBody Infokanri infokanri,
             @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
         System.out.println("=== 収支データ登録 ===");
@@ -38,7 +38,10 @@ public class InfokanriController {
         Infokanri savedData = service.saveInfokanri(infokanri);
 
         System.out.println("保存されたデータ: " + savedData.toString());
-        return ResponseEntity.ok(savedData);
+        System.out.println("レスポンス送信: " + savedData.toString());
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(savedData);
     }
 
     /**
@@ -73,20 +76,23 @@ public class InfokanriController {
      * @param userId ユーザーID
      * @return 更新された収支データ
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<Infokanri> updateData(@PathVariable Long id, @RequestBody Infokanri infokanri,
+    @PutMapping(value = "/{id}", produces = "application/json")
+    public ResponseEntity<Infokanri> updateData(@PathVariable Long id,
+            @RequestBody Infokanri infokanri,
             @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
         System.out.println("=== 収支データ更新 ===");
         System.out.println("ID: " + id);
         System.out.println("User ID: " + userId);
         System.out.println("更新データ: " + infokanri.toString());
-        
+
         infokanri.setId(id);
         infokanri.setUserId(userId);
         Infokanri updatedData = service.updateInfokanri(infokanri);
-        
+
         System.out.println("更新されたデータ: " + updatedData.toString());
-        return ResponseEntity.ok(updatedData);
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(updatedData);
     }
 
     /**
