@@ -11,12 +11,15 @@
 - **ホスティング**: Render Platform
 - **本番URL**: https://kakeibo-app-gy0m.onrender.com
 - **バージョン**: 0.0.1-SNAPSHOT
+- **運用状況**: 🟢 本番稼働中・自動監視完備
+- **最終デプロイ**: 2025年6月23日
 
 ### アプリケーションの特徴
 - **日本語完全対応**: UI、データ、カテゴリすべて日本語
 - **シンプル設計**: ユーザー認証なし、直感的な操作
 - **レスポンシブ対応**: PC・スマートフォン両対応
 - **リアルタイム更新**: Ajax通信による動的画面更新
+- **エンタープライズ級運用**: 自動監視・通知・障害対応システム完備
 
 ---
 
@@ -50,9 +53,21 @@ HTML5 + CSS3 + Vanilla JavaScript
 ```
 Render Platform
 ├── Web Service (アプリケーション)
-├── PostgreSQL Database
+├── PostgreSQL Database (Render PostgreSQL)
 ├── 自動デプロイ (GitHub連携)
-└── 環境変数管理
+├── 環境変数管理
+├── Render MCP Server (VS Code統合)
+└── 運用監視システム
+```
+
+#### 運用・監視システム（新機能）
+```
+自動監視・通知基盤
+├── RenderMonitoringService (デプロイ監視)
+├── NotificationService (LINE通知)
+├── DatabaseConfig (接続診断・自動復旧)
+├── HikariCP (コネクションプール最適化)
+└── MCP連携 (VS Code → Render API)
 ```
 
 ### アーキテクチャパターン
@@ -60,6 +75,9 @@ Render Platform
 - **Repository Pattern**: データアクセス層の抽象化
 - **DTO/Entity分離**: データ転送オブジェクトの活用
 - **依存性注入**: Spring DIコンテナ活用
+- **エンタープライズ監視**: 自動デプロイ監視・通知システム
+- **障害自動復旧**: データベース接続エラーの詳細診断・自動修復
+- **DevOps統合**: MCP経由でのRender API連携・VS Code統合開発
 
 ---
 
@@ -146,6 +164,31 @@ const expenditureCategories = [
 - **収支集計**: 収入・支出・収支バランス
 - **カテゴリ別集計**: 支出カテゴリ別内訳
 - **視覚的表示**: 金額の強調表示・色分け
+
+### 5. 運用監視システム（エンタープライズ機能）
+
+#### 自動デプロイ監視 (`RenderMonitoringService`)
+- **リアルタイム監視**: Render API経由でデプロイ状況を自動監視
+- **ステータス追跡**: デプロイ開始→進行→成功/失敗の全工程追跡
+- **ログ分析**: デプロイ失敗時のエラーログ自動解析・分類
+- **通知連携**: LINE Bot経由での即座な通知配信
+
+#### LINE通知システム (`NotificationService`)
+- **Flexメッセージ**: 豊富な情報を含む構造化通知
+- **テキスト通知**: 緊急時の簡潔な状況報告
+- **通知タイプ**:
+  - デプロイ開始通知
+  - デプロイ成功通知（コミット情報・時刻含む）
+  - デプロイ失敗通知（エラー分析・対処法含む）
+  - アプリケーション起動完了通知
+  - データベース接続エラー通知
+
+#### データベース接続診断 (`DatabaseConfig`)
+- **多段階診断**: 環境変数→接続文字列→実接続の段階的検証
+- **JDBC URL自動変換**: `user:pass@host`形式→標準JDBC形式への自動変換
+- **詳細ログ**: SQLState、エラーコード、接続時間の詳細記録
+- **自動リトライ**: 接続失敗時の自動再試行（指数バックオフ）
+- **HikariCP最適化**: コネクションプール設定の動的調整
 
 ---
 
@@ -439,6 +482,17 @@ spring.jpa.properties.hibernate.format_sql=true
 spring.datasource.hikari.maximum-pool-size=3
 spring.datasource.hikari.minimum-idle=1
 spring.datasource.hikari.connection-timeout=30000
+spring.datasource.hikari.idle-timeout=600000
+spring.datasource.hikari.max-lifetime=1800000
+
+# 運用監視設定
+app.render.monitoring.enabled=true
+app.render.monitoring.check-interval=300
+app.render.service.id=srv-d12hh8mmcj7s73fc6170
+
+# LINE通知設定（環境変数で設定）
+# LINE_CHANNEL_ACCESS_TOKEN=${LINE_CHANNEL_ACCESS_TOKEN}
+# LINE_CHANNEL_SECRET=${LINE_CHANNEL_SECRET}
 
 # SQL初期化設定
 spring.sql.init.mode=never
@@ -466,6 +520,15 @@ PORT=10000
 
 # Java設定
 JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=50.0
+
+# 運用監視設定
+RENDER_SERVICE_ID=srv-d12hh8mmcj7s73fc6170
+RENDER_API_KEY=rnd_xxxxxxxxxxxxxxxxxxxxx
+
+# LINE Bot設定
+LINE_CHANNEL_ACCESS_TOKEN=xxxxxxxxxxxxxxxxxxxxx
+LINE_CHANNEL_SECRET=xxxxxxxxxxxxxxxxxxxxx
+LINE_DESTINATION_USER_ID=Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ---
@@ -486,9 +549,12 @@ kakeibo-app/
 │   │   │   ├── repository/
 │   │   │   │   └── InfokanriRepository.java    # Spring Data JPA リポジトリ
 │   │   │   ├── service/
-│   │   │   │   └── InfokanriService.java       # ビジネスロジック層
+│   │   │   │   ├── InfokanriService.java       # ビジネスロジック層
+│   │   │   │   ├── NotificationService.java    # 【NEW】LINE通知サービス
+│   │   │   │   └── RenderMonitoringService.java # 【NEW】Render監視サービス
 │   │   │   └── config/
-│   │   │       └── CorsConfig.java             # CORS設定
+│   │   │       ├── CorsConfig.java             # CORS設定
+│   │   │       └── DatabaseConfig.java         # 【強化】DB接続・診断設定
 │   │   └── resources/
 │   │       ├── application.properties           # 開発環境設定
 │   │       ├── application-production.properties # 本番環境設定
@@ -509,12 +575,18 @@ kakeibo-app/
 │       └── java/com/mycompany/webapp/
 │           ├── WebappApplicationTests.java      # 統合テスト
 │           ├── RenderPostgreSQLConnectionTest.java # DB接続テスト
-│           └── SimpleConnectionTest.java        # 簡易接続テスト
+│           └── DatabaseConnectionTest.java      # 【NEW】DB診断テスト
+├── .vscode/
+│   └── settings.json                            # 【NEW】MCP設定・Render連携
 ├── pom.xml                                      # Maven設定
 ├── render.yaml                                  # Render デプロイ設定
 ├── README.md                                    # プロジェクト概要
-├── APPLICATION_SPEC.md                          # 旧仕様書
-└── COMPLETE_SPECIFICATION.md                    # 本仕様書
+├── COMPLETE_SPECIFICATION.md                    # 本仕様書
+├── DEPLOY_NOTIFICATION_SETUP.md                 # 【NEW】デプロイ通知設定手順
+├── EMERGENCY_RESPONSE_GUIDE.md                  # 【NEW】緊急対応手順
+├── render-env-config.md                         # Render環境設定
+├── render-environment-setup.md                  # 環境構築手順
+└── render-postgresql-setup.md                   # PostgreSQL設定手順
 ```
 
 ---
@@ -884,5 +956,5 @@ JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=50.0
 **この仕様書は現在のアプリケーション状態を正確に反映しており、新規プロジェクト立ち上げ時の完全な参考資料として活用できます。**
 
 **作成日: 2025年6月22日**  
-**最終更新: 2025年6月22日**  
-**バージョン: 1.0.0**
+**最終更新: 2025年6月23日**  
+**バージョン: 1.1.0（運用監視システム統合版）**

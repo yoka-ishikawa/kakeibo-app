@@ -1,10 +1,13 @@
 # 家計簿管理アプリ (Kakeibo App)
 
-日本の家計簿文化に基づいた収支管理Webアプリケーションです。
+日本の家計簿文化に基づいた収支管理Webアプリケーションです。Render環境での本格運用と自動監視・通知システムを搭載しています。
 
 ## 🌐 本番環境
 
-**URL**: [https://kakeibo-app-gy0m.onrender.com](https://kakeibo-app-gy0m.onrender.com)
+**URL**: [https://kakeibo-app-gy0m.onrender.com](https://kakeibo-app-gy0m.onrender.com)  
+**ステータス**: 🟢 LIVE運用中  
+**最終デプロイ**: 2025年1月26日  
+**監視システム**: 自動デプロイ監視・LINE通知完備
 
 ## 📋 機能一覧
 
@@ -30,7 +33,9 @@
 
 ### データベース
 - **H2 Database** (開発環境)
-- **PostgreSQL** (本番環境 - Supabase)
+- **PostgreSQL** (本番環境 - Render PostgreSQL)
+- **HikariCP** (コネクションプール)
+- **JDBC URL自動変換** (認証情報エラー対策)
 
 ### フロントエンド
 - **HTML5** / **CSS3** / **JavaScript (ES6+)**
@@ -38,9 +43,15 @@
 - **Fetch API** (Ajax通信)
 
 ### インフラ・デプロイ
-- **Render** (Webホスティング)
-- **GitHub** (ソースコード管理)
-- **GitHub Actions** (CI/CD)
+- **Render** (Webホスティング・PostgreSQL)
+- **GitHub** (ソースコード管理・自動デプロイ)
+- **Render MCP Server** (VS Code統合・API監視)
+
+### 運用・監視システム  
+- **自動デプロイ監視** (Render API連携)
+- **LINE通知システム** (デプロイ成功/失敗/エラー通知)
+- **データベース接続診断** (多段階エラー解析)
+- **システム状態自動通知** (Flex メッセージ形式)
 
 ## 🚀 セットアップ
 
@@ -74,14 +85,23 @@ http://localhost:8080
 
 ### 本番環境デプロイ
 
-本アプリケーションはRenderにデプロイされており、以下の環境変数が設定されています：
+本アプリケーションはRenderにデプロイされており、自動監視・通知システムが稼働しています：
 
+#### 環境変数設定
 ```bash
 DATABASE_URL=postgresql://username:password@host:5432/database
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
 PORT=8080
+RENDER_SERVICE_NAME=kakeibo-app
+SPRING_PROFILES_ACTIVE=production
 ```
+
+#### 自動監視・通知機能
+- **デプロイ監視**: Render API経由でリアルタイム監視
+- **LINE通知**: デプロイ成功/失敗/エラー時に自動通知
+- **データベース診断**: 接続エラーの詳細分析・解決ガイド
+- **MCP連携**: VS CodeからRender APIを直接操作可能
 
 ## 📊 API仕様
 
@@ -137,9 +157,12 @@ kakeibo-app/
 │   │   │   ├── repository/
 │   │   │   │   └── InfokanriRepository.java    # データアクセス
 │   │   │   ├── service/
-│   │   │   │   └── InfokanriService.java       # ビジネスロジック
+│   │   │   │   ├── InfokanriService.java       # ビジネスロジック
+│   │   │   │   ├── NotificationService.java    # LINE通知サービス
+│   │   │   │   └── RenderMonitoringService.java # 自動監視サービス
 │   │   │   └── config/
-│   │   │       └── CorsConfig.java             # CORS設定
+│   │   │       ├── CorsConfig.java             # CORS設定
+│   │   │       └── DatabaseConfig.java         # DB設定(高度診断付き)
 │   │   └── resources/
 │   │       ├── static/                         # 静的リソース
 │   │       │   ├── css/
@@ -150,11 +173,22 @@ kakeibo-app/
 │   └── test/                                   # テストコード
 ├── pom.xml                                     # Maven設定
 ├── render.yaml                                 # Render設定
-└── README.md
+├── Dockerfile                                  # コンテナ設定
+├── COMPLETE_SPECIFICATION.md                   # 完全仕様書
+├── DEPLOY_NOTIFICATION_SETUP.md               # デプロイ通知設定
+├── EMERGENCY_RESPONSE_GUIDE.md                # 緊急対応ガイド
+└── README.md                                  # このファイル
 ```
 
 ## 🎯 設計ドキュメント
 
+### 主要技術文書
+- **[完全仕様書](COMPLETE_SPECIFICATION.md)** - システム全体の詳細仕様
+- **[デプロイ通知設定](DEPLOY_NOTIFICATION_SETUP.md)** - 自動監視・LINE通知設定
+- **[緊急対応ガイド](EMERGENCY_RESPONSE_GUIDE.md)** - 障害発生時の対応手順
+- **[Render環境設定](render-env-config.md)** - 本番環境設定詳細
+
+### 外部設計資料  
 - [要件定義](https://docs.google.com/spreadsheets/d/1Zykgngd74m_7o4Q2fOFoc-ADYFo8yUvBVfWy_AblrVE/edit?usp=sharing)
 - [基本設計 - メニュー画面](https://1drv.ms/x/c/58cea19fddb0da42/EctnvARHl_1FmGneeVdNnLIBMI-n8h4nmD3XnTzzbs-xnA?e=PEHUKN)
 - [基本設計 - 収支登録画面](https://1drv.ms/x/c/58cea19fddb0da42/EVyvpGkGaGVGp8XeeQBbI7kBVDU4-XgAOXP1F1zyWZVlBA?e=N2oalV)
@@ -179,9 +213,11 @@ kakeibo-app/
 - JavaScript: ES6+モダン構文使用
 - CSS: BEM命名規則推奨
 
-### デバッグ
+### デバッグ・ログ
 - アプリケーションログ: `logging.level.com.mycompany.webapp=DEBUG`
 - H2コンソール: `http://localhost:8080/h2-console` (開発環境)
+- Render監視ログ: `RenderMonitoringService` 自動出力
+- データベース診断: `DatabaseConfig` 詳細分析ログ
 
 ### ビルド・デプロイ
 ```bash
@@ -191,16 +227,34 @@ kakeibo-app/
 # Docker実行 (オプション)
 docker build -t kakeibo-app .
 docker run -p 8080:8080 kakeibo-app
+
+# Render MCP操作 (VS Code内)
+# サービスリスト取得、デプロイ監視、ログ確認が可能
 ```
+
+### 監視・運用
+- **Render MCP Server**: VS CodeからRender APIを直接操作
+- **自動通知**: デプロイ結果・エラー発生時にLINE通知
+- **データベース診断**: JDBC接続エラーの自動解析・解決提案
+- **ログ監視**: デプロイログ・アプリケーションログの自動取得
 
 ## 📈 今後の拡張予定
 
+### 完了済み機能 ✅
+- [x] Render本番環境の安定運用
+- [x] PostgreSQL接続エラー自動解決システム
+- [x] デプロイ監視・自動通知システム(LINE)
+- [x] VS Code + MCP Serverによる運用自動化
+- [x] データベース接続診断・エラー分析システム
+
+### 開発予定 🚧
 - [ ] ユーザー認証機能
 - [ ] データエクスポート機能
 - [ ] 予算管理機能
-- [ ] グラフ・チャート表示
+- [ ] グラフ・チャート表示の強化
 - [ ] スマートフォン対応 (PWA)
 - [ ] 多言語対応
+- [ ] 高度な分析・レポート機能
 
 ## 🤝 コントリビューション
 
@@ -220,4 +274,6 @@ docker run -p 8080:8080 kakeibo-app
 
 ---
 
-**最終更新**: 2025年6月16日
+**最終更新**: 2025年6月23日  
+**プロジェクト状況**: 🟢 本番稼働中・自動監視システム完備  
+**技術レベル**: エンタープライズ級・本格運用対応

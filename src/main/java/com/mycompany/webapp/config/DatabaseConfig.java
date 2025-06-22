@@ -15,9 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * データベース設定（改良版・詳細エラーハンドリング付き）
- * 環境変数の詳細チェックと段階的接続試行
- * JDBC URL認証情報の自動変換機能付き
+ * データベース設定（改良版・詳細エラーハンドリング付き） 環境変数の詳細チェックと段階的接続試行 JDBC URL認証情報の自動変換機能付き
  */
 @Configuration
 @Profile("production")
