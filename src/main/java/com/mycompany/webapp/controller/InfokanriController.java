@@ -20,9 +20,7 @@ public class InfokanriController {
      */
     public InfokanriController(InfokanriService service) {
         this.service = service;
-    }
-
-    /**
+    }    /**
      * 新しい収支データを登録
      * 
      * @param infokanri 登録する収支データ
@@ -30,7 +28,7 @@ public class InfokanriController {
      * @return 登録された収支データ（IDを含む）
      */
     @PostMapping
-    public Infokanri add(@RequestBody Infokanri infokanri,
+    public ResponseEntity<Infokanri> add(@RequestBody Infokanri infokanri,
             @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
         System.out.println("=== 収支データ登録 ===");
         System.out.println("User ID: " + userId);
@@ -40,7 +38,7 @@ public class InfokanriController {
         Infokanri savedData = service.saveInfokanri(infokanri);
 
         System.out.println("保存されたデータ: " + savedData.toString());
-        return savedData;
+        return ResponseEntity.ok(savedData);
     }
 
     /**
@@ -67,9 +65,7 @@ public class InfokanriController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    /**
+    }    /**
      * 既存の収支データを更新
      * 
      * @param id 更新対象のデータID
@@ -78,11 +74,19 @@ public class InfokanriController {
      * @return 更新された収支データ
      */
     @PutMapping("/{id}")
-    public Infokanri updateData(@PathVariable Long id, @RequestBody Infokanri infokanri,
+    public ResponseEntity<Infokanri> updateData(@PathVariable Long id, @RequestBody Infokanri infokanri,
             @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
+        System.out.println("=== 収支データ更新 ===");
+        System.out.println("ID: " + id);
+        System.out.println("User ID: " + userId);
+        System.out.println("更新データ: " + infokanri.toString());
+        
         infokanri.setId(id);
         infokanri.setUserId(userId);
-        return service.updateInfokanri(infokanri);
+        Infokanri updatedData = service.updateInfokanri(infokanri);
+        
+        System.out.println("更新されたデータ: " + updatedData.toString());
+        return ResponseEntity.ok(updatedData);
     }
 
     /**
