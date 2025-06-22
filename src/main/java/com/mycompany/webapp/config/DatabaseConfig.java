@@ -1,4 +1,4 @@
-package com.mycompany.webapp.config;
+﻿package com.mycompany.webapp.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -9,13 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.mycompany.webapp.service.NotificationService;
 
 import javax.sql.DataSource;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * データベース設定（改良版・詳細エラーハンドリング付き） 環境変数の詳細チェックと段階的接続試行
+ * データベース設定（改良版・詳細エラーハンドリング付き） 
+ * 環境変数の詳細チェックと段階的接続試行
+ * JDBC URL認証情報の自動変換機能付き
  */
 @Configuration
 @Profile("production")
 public class DatabaseConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseConfig.class);
 
     @Autowired
     private NotificationService notificationService;
@@ -39,7 +47,9 @@ public class DatabaseConfig {
         System.out.println("  DB_PASSWORD: "
                 + (password != null ? "✅ 設定済み (長さ: " + password.length() + ")" : "❌ 未設定"));
         System.out.println("  RENDER_SERVICE_NAME: " + renderServiceName);
-        System.out.println("  SPRING_PROFILES_ACTIVE: " + springProfile);        // 必須環境変数の検証
+        System.out.println("  SPRING_PROFILES_ACTIVE: " + springProfile);
+
+        // 必須環境変数の検証
         if (databaseUrl == null || databaseUrl.trim().isEmpty()) {
             String errorMsg = "❌ DATABASE_URL が設定されていません。\n" + "Renderダッシュボードで以下を確認してください:\n"
                     + "1. PostgreSQLサービスが作成されているか\n" + "2. 環境変数 DATABASE_URL が設定されているか\n"
@@ -47,9 +57,15 @@ public class DatabaseConfig {
             System.err.println(errorMsg);
             throw new RuntimeException(errorMsg);
         }
-        
+
         // DATABASE_URLプロトコル自動修正
         databaseUrl = fixDatabaseUrlProtocol(databaseUrl);
+        
+        // JDBC URL認証情報の自動変換
+        String[] credentials = extractAndFixCredentials(databaseUrl);
+        databaseUrl = credentials[0]; // 修正されたURL
+        if (credentials[1] != null) username = credentials[1]; // 抽出されたユーザー名
+        if (credentials[2] != null) password = credentials[2]; // 抽出されたパスワード
 
         if (username == null || username.trim().isEmpty()) {
             String errorMsg =
@@ -66,6 +82,84 @@ public class DatabaseConfig {
         }
 
         return createDataSourceWithRetry(databaseUrl, username, password);
+    }
+
+    /**
+     * JDBC URLから認証情報を抽出し、標準形式に変換する
+     * user:pass@host:port/db → host:port/db + 別途認証情報
+     */
+    private String[] extractAndFixCredentials(String url) {
+        try {
+            // 既にJDBC標準形式（認証情報が含まれていない）の場合はそのまま返す
+            if (!url.contains("@") || url.startsWith("jdbc:postgresql://") && !url.matches(".*://[^@]+:[^@]+@.*")) {
+                return new String[]{url, null, null};
+            }
+
+            // user:pass@host形式を検出・変換
+            Pattern pattern = Pattern.compile("(.*)://([^:]+):([^@]+)@(.+)");
+            Matcher matcher = pattern.matcher(url);
+            
+            if (matcher.matches()) {
+                String protocol = matcher.group(1);
+                String user = matcher.group(2);
+                String pass = matcher.group(3);
+                String hostAndDb = matcher.group(4);
+                
+                String fixedUrl = protocol + "://" + hostAndDb;
+                
+                logger.info("JDBC URL認証情報を標準形式に変換:");
+                logger.info("変換前: {}://{}:***@{}", protocol, user, hostAndDb);
+                logger.info("変換後: {}", fixedUrl);
+                logger.info("抽出されたユーザー名: {}", user);
+                
+                // LINE通知でJDBC URL変換を報告
+                sendJdbcUrlConversionNotification(user, hostAndDb, fixedUrl);
+                
+                return new String[]{fixedUrl, user, pass};
+            }
+            
+            return new String[]{url, null, null};
+            
+        } catch (Exception e) {
+            logger.error("JDBC URL認証情報の変換中にエラー: {}", e.getMessage());
+            return new String[]{url, null, null};
+        }
+    }
+
+    /**
+     * JDBC URL変換の通知を送信
+     */
+    private void sendJdbcUrlConversionNotification(String username, String hostAndDb, String fixedUrl) {
+        try {
+            // Flexメッセージで通知
+            notificationService.sendConnectionErrorDetails(
+                "JDBC URL自動変換",
+                String.format("認証情報をJDBC標準形式に変換: %s → %s", username + "@" + hostAndDb, fixedUrl),
+                fixedUrl
+            );
+        } catch (Exception e) {
+            logger.warn("JDBC URL変換のFlex通知に失敗、テキスト通知を送信: {}", e.getMessage());
+            
+            // Flexメッセージが失敗した場合はテキスト通知
+            try {
+                String message = String.format(
+                    "🔧 JDBC URL自動変換完了\n\n" +
+                    "📊 変換内容:\n" +
+                    "• ユーザー名: %s\n" +
+                    "• 接続先: %s\n" +
+                    "• 新URL: %s\n\n" +
+                    "⚡ 認証情報をJDBC標準形式に変換しました",
+                    username, hostAndDb, fixedUrl
+                );
+                notificationService.sendConnectionErrorDetails(
+                    "JDBC URL変換テキスト通知", 
+                    message,
+                    fixedUrl
+                );
+            } catch (Exception ex) {
+                logger.error("JDBC URL変換のテキスト通知も失敗: {}", ex.getMessage());
+            }
+        }
     }
 
     /**
@@ -148,6 +242,7 @@ public class DatabaseConfig {
         config.addDataSourceProperty("loginTimeout", "10");
         config.addDataSourceProperty("ssl", "true");
         config.addDataSourceProperty("sslmode", "require");
+
         // 直接JDBC接続テストを先に実行
         System.out.println("=== 1. 直接JDBC接続テスト ===");
         testDirectJdbcConnection(databaseUrl, username, password);
@@ -236,9 +331,9 @@ public class DatabaseConfig {
 
                     // 接続設定確認
                     System.out.println("=== 接続設定 ===");
-                    try (var rs = stmt.executeQuery("SHOW ssl, SHOW port, SHOW max_connections")) {
+                    try (var rs = stmt.executeQuery("SHOW ssl")) {
                         while (rs.next()) {
-                            System.out.println("設定値: " + rs.getString(1));
+                            System.out.println("SSL設定: " + rs.getString(1));
                         }
                     } catch (Exception e) {
                         System.out.println("設定確認をスキップ: " + e.getMessage());
@@ -401,15 +496,14 @@ public class DatabaseConfig {
     }
 
     /**
-     * データベースURLプロトコル自動修正
-     * postgres:// または postgresql:// を jdbc:postgresql:// に変換
+     * データベースURLプロトコル自動修正 postgres:// または postgresql:// を jdbc:postgresql:// に変換
      */
     private String fixDatabaseUrlProtocol(String originalUrl) {
         System.out.println("=== DATABASE_URL プロトコル確認・修正 ===");
         System.out.println("元のURL: " + maskUrl(originalUrl));
-        
+
         String fixedUrl = originalUrl;
-        
+
         if (originalUrl.startsWith("postgres://")) {
             fixedUrl = "jdbc:postgresql://" + originalUrl.substring("postgres://".length());
             System.out.println("✅ postgres:// を jdbc:postgresql:// に自動修正");
@@ -419,25 +513,25 @@ public class DatabaseConfig {
         } else if (originalUrl.startsWith("jdbc:postgresql://")) {
             System.out.println("✅ 既に正しい形式 (jdbc:postgresql://)");
         } else {
-            System.err.println("⚠️ 未知のプロトコル: " + originalUrl.substring(0, originalUrl.indexOf("://")));
+            System.err.println(
+                    "⚠️ 未知のプロトコル: " + originalUrl.substring(0, originalUrl.indexOf("://")));
         }
-        
+
         System.out.println("修正後URL: " + maskUrl(fixedUrl));
-        
+
         // 修正が行われた場合はLINE通知
         if (!originalUrl.equals(fixedUrl)) {
             try {
-                String message = "🔧 データベースURL自動修正\\n" +
-                               "元のプロトコル: " + originalUrl.substring(0, originalUrl.indexOf("://")) + "://\\n" +
-                               "修正後: jdbc:postgresql://\\n" +
-                               "✅ 接続問題を自動解決しました！";
-                notificationService.sendConnectionErrorDetails("URL_AUTO_FIX", 
-                    "プロトコル自動修正完了", message);
+                String message = "🔧 データベースURL自動修正\\n" + "元のプロトコル: "
+                        + originalUrl.substring(0, originalUrl.indexOf("://")) + "://\\n"
+                        + "修正後: jdbc:postgresql://\\n" + "✅ 接続問題を自動解決しました！";
+                notificationService.sendConnectionErrorDetails("URL_AUTO_FIX", "プロトコル自動修正完了",
+                        message);
             } catch (Exception e) {
                 System.err.println("⚠️ URL修正通知の送信失敗: " + e.getMessage());
             }
         }
-        
+
         return fixedUrl;
     }
 }
