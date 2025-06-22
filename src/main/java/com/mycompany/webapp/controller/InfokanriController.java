@@ -26,7 +26,8 @@ public class InfokanriController {
    * @param infokanri 登録する収支データ
    * @param userId ユーザーID（リクエストヘッダーから取得）
    * @return 登録された収支データ（IDを含む）
-   */  @PostMapping(produces = "application/json")
+   */
+  @PostMapping(produces = "application/json")
   public ResponseEntity<String> add(@RequestBody Infokanri infokanri,
       @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
     System.out.println("=== 収支データ登録開始 ===");
@@ -41,7 +42,7 @@ public class InfokanriController {
       Infokanri savedData = null;
       int retryCount = 0;
       int maxRetries = 3;
-      
+
       while (retryCount < maxRetries) {
         try {
           System.out.println("データベース保存試行: " + (retryCount + 1) + "/" + maxRetries);
@@ -49,15 +50,16 @@ public class InfokanriController {
           System.out.println("データベース保存完了");
           System.out.println("保存されたデータ: " + savedData.toString());
           break; // 成功した場合、ループを抜ける
-          
+
         } catch (Exception dbException) {
           retryCount++;
-          System.err.println("データベース接続エラー (試行 " + retryCount + "/" + maxRetries + "): " + dbException.getMessage());
-          
+          System.err.println("データベース接続エラー (試行 " + retryCount + "/" + maxRetries + "): "
+              + dbException.getMessage());
+
           if (retryCount >= maxRetries) {
             throw dbException; // 最大試行回数に達した場合、例外を再スロー
           }
-          
+
           // 再試行前に少し待機
           try {
             Thread.sleep(2000); // 2秒待機
