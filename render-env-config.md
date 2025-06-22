@@ -4,7 +4,7 @@
 
 ### DATABASE_URL
 ```
-jdbc:postgresql://dpg-d1j8h7he5dus7396aujg-a.singapore-postgres.render.com:5432/kakeibo_db?sslmode=require
+jdbc:postgresql://dpg-d1j8h7he5dus7396aujg-a.singapore-postgres.render.com:5432/kakeibo_db?sslmode=require&connectTimeout=30&socketTimeout=30&loginTimeout=30
 ```
 
 ### DB_DRIVER
@@ -35,6 +35,21 @@ production
 ### PORT
 ```
 10000
+```
+
+### DDL_AUTO
+```
+none
+```
+
+### SHOW_SQL
+```
+true
+```
+
+### SQL_INIT_MODE
+```
+never
 ```
 
 ## 設定手順
@@ -105,3 +120,42 @@ jdbc:postgresql://dpg-d12hm7je5dus7396aujg-a.singapore-postgres.render.com:5432/
 SPRING_PROFILES_ACTIVE=
 ```
 （productionプロファイルを無効にしてH2使用）
+
+## 接続トラブルシューティング用設定
+
+### 接続診断のための一時的な環境変数
+**注意: 接続確認後は削除すること**
+
+### LOGGING_LEVEL_COM_ZAXXER_HIKARI
+```
+DEBUG
+```
+
+### LOGGING_LEVEL_ORG_POSTGRESQL
+```
+DEBUG
+```
+
+### SPRING_JPA_SHOW_SQL
+```
+true
+```
+
+## 接続エラー対応手順
+
+1. **環境変数の確認**
+   - 上記すべての環境変数が正しく設定されているか確認
+   - 特にDATABASE_URL, DB_USERNAME, DB_PASSWORDの値をチェック
+
+2. **Render PostgreSQLサービスの状態確認**
+   - Renderダッシュボードで`kakeibo-db`サービスが"Available"状態か確認
+   - 接続情報が変更されていないか確認
+
+3. **段階的デプロイ**
+   - まず接続のみテスト（schema.sqlは無効）
+   - 接続成功後、手動でテーブル作成
+   - 最後にアプリケーション機能をテスト
+
+4. **接続情報の再確認**
+   - RenderのPostgreSQLダッシュボードで最新の接続情報を確認
+   - 接続文字列、ユーザー名、パスワードが正確かチェック
