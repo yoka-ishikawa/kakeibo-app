@@ -35,13 +35,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // 収支を計算
       let totalIncome = 0;
-      let totalExpenditure = 0;
-
-      data.forEach((item) => {
-        if (item.type === "income") {
-          totalIncome += item.amount;
-        } else if (item.type === "expenditure") {
-          totalExpenditure += item.amount;
+      let totalExpenditure = 0;      data.forEach((item) => {
+        if (item.syubetu === "収入") {      // type → syubetu, "income" → "収入"
+          totalIncome += item.kingaku;      // amount → kingaku
+        } else if (item.syubetu === "支出") { // type → syubetu, "expenditure" → "支出"
+          totalExpenditure += item.kingaku; // amount → kingaku
         }
       });
 

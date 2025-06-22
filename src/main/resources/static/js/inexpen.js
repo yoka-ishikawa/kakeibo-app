@@ -197,21 +197,23 @@ document
       const params = new URLSearchParams(window.location.search);
       const id = params.get("id");
       const isEditMode = id !== null;
-      
-      // 収支登録またはAPIにリクエストを送信
+        // 収支登録またはAPIにリクエストを送信
       try {
+        // リクエストペイロードを作成（新しいテーブル構造に対応）
         const payload = {
-          registeredAt: date,
-          type: incomeOrExpenditure,
-          category: category,
-          amount: parseInt(amount, 10), // 金額を整数に変換
-          updateDateTime: new Date().toISOString(), // 更新日時を現在の日時に設定
+          hiduke: date,           // registeredAt → hiduke
+          syubetu: incomeOrExpenditure === "income" ? "収入" : "支出", // type → syubetu (日本語)
+          naisyo: category,       // category → naisyo
+          kingaku: parseInt(amount, 10), // amount → kingaku
         };
         console.log("送信するデータ:", payload); // 送信するデータをログに出力
 
-        // ローカルストレージからユーザートークンを取得
-        const userToken = localStorage.getItem("userToken");
-        
+        // ローカルストレージからユーザーIDを取得（userTokenからuserIdに変更）
+        let userId = localStorage.getItem("userId");
+        if (!userId) {
+          userId = "anonymous_user_" + Date.now();
+          localStorage.setItem("userId", userId);
+        }        
         // リクエストメソッドとURLを設定
         const method = isEditMode ? "PUT" : "POST";
         const url = isEditMode ? `/api/infokanri/${id}` : "/api/infokanri";
@@ -220,7 +222,7 @@ document
           method: method,
           headers: {
             "Content-Type": "application/json",
-            "X-User-Token": userToken,
+            "X-User-Id": userId, // X-User-Token → X-User-Id
           },
           body: JSON.stringify(payload),
         });

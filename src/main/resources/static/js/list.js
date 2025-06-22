@@ -15,19 +15,18 @@ async function loadDataList() {
     if (data.length === 0) {
       tbody.innerHTML = '<tr><td colspan="5">データがありません</td></tr>';
       return;
-    }
-
-    data.forEach((item) => {
+    }    data.forEach((item) => {
       const row = document.createElement("tr");
       row.dataset.id = item.id;
       
-      const typeText = item.type === "income" ? "収入" : "支出";
-      const amountText = item.amount.toLocaleString() + "円";
+      // 新しいテーブル構造に対応
+      const typeText = item.syubetu; // 既に日本語で格納されている
+      const amountText = item.kingaku.toLocaleString() + "円"; // amount → kingaku
       
       row.innerHTML = `
-        <td class="date-cell">${item.registeredAt}</td>
+        <td class="date-cell">${item.hiduke}</td>         
         <td class="type-cell">${typeText}</td>
-        <td class="category-cell">${item.category}</td>
+        <td class="category-cell">${item.naisyo}</td>      
         <td class="amount-cell">${amountText}</td>
         <td>
           <div class="button-wrapper">
