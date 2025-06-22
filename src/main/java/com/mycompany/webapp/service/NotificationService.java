@@ -698,4 +698,23 @@ public class NotificationService {
 
         return truncated.toString();
     }
+
+    /**
+     * 詳細な接続エラー情報をLINEに送信
+     */    public void sendConnectionErrorDetails(String errorType, String errorMessage, String diagnostic) {
+        try {
+            String message = "🚨 DB接続エラー詳細\\n" +
+                           "時刻: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")) + "\\n" +
+                           "エラータイプ: " + (errorType != null ? errorType : "不明") + "\\n" +
+                           "メッセージ: " + (errorMessage != null ? errorMessage.substring(0, Math.min(errorMessage.length(), 100)) : "詳細なし") + "\\n" +
+                           "診断情報: " + (diagnostic != null ? diagnostic.substring(0, Math.min(diagnostic.length(), 100)) : "診断情報なし") + "\\n" +
+                           "💡対処: Renderダッシュボードで環境変数・DBサービス状態を確認";
+            
+            sendLineMessage(message);
+            System.out.println("📱 詳細接続エラー情報をLINEに送信しました");
+            
+        } catch (Exception e) {
+            System.err.println("❌ LINE通知送信エラー: " + e.getMessage());
+        }
+    }
 }
