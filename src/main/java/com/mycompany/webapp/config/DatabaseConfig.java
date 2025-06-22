@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Profile;
 import javax.sql.DataSource;
 
 /**
- * データベース設定（緊急対応・シンプル版）
- * 複雑な段階的試行を一旦停止し、最もシンプルな設定でテスト
+ * データベース設定（改良版・詳細エラーハンドリング付き）
+ * 環境変数の詳細チェックと段階的接続試行
  */
 @Configuration
 @Profile("production")
@@ -18,75 +18,134 @@ public class DatabaseConfig {
 
     @Bean
     public DataSource dataSource() {
-        System.out.println("=== シンプルデータベース接続設定 ===");
+        System.out.println("=== データベース接続設定開始 ===");
         
-        // 環境変数から接続情報を取得
+        // 環境変数の詳細確認
         String databaseUrl = System.getenv("DATABASE_URL");
         String username = System.getenv("DB_USERNAME");
         String password = System.getenv("DB_PASSWORD");
+        String renderServiceName = System.getenv("RENDER_SERVICE_NAME");
+        String springProfile = System.getenv("SPRING_PROFILES_ACTIVE");
 
-        System.out.println("接続情報確認:");
-        System.out.println("  URL: " + databaseUrl);
-        System.out.println("  User: " + username);
-        System.out.println("  Pass: " + (password != null ? "設定済み" : "未設定"));
+        System.out.println("環境変数確認:");
+        System.out.println("  DATABASE_URL: " + (databaseUrl != null ? maskUrl(databaseUrl) : "❌ 未設定"));
+        System.out.println("  DB_USERNAME: " + (username != null ? "✅ 設定済み (" + username + ")" : "❌ 未設定"));
+        System.out.println("  DB_PASSWORD: " + (password != null ? "✅ 設定済み (長さ: " + password.length() + ")" : "❌ 未設定"));
+        System.out.println("  RENDER_SERVICE_NAME: " + renderServiceName);
+        System.out.println("  SPRING_PROFILES_ACTIVE: " + springProfile);
         
-        // 環境変数が不正な場合の対応
-        if (databaseUrl == null || username == null || password == null) {
-            String error = "❌ 環境変数が不完全です:\n" +
-                          "  DATABASE_URL: " + (databaseUrl != null ? "設定済み" : "未設定") + "\n" +
-                          "  DB_USERNAME: " + (username != null ? "設定済み" : "未設定") + "\n" +
-                          "  DB_PASSWORD: " + (password != null ? "設定済み" : "未設定");
-            System.err.println(error);
-            throw new RuntimeException("データベース環境変数が設定されていません。Renderの設定を確認してください。");
+        // 必須環境変数の検証
+        if (databaseUrl == null || databaseUrl.trim().isEmpty()) {
+            String errorMsg = "❌ DATABASE_URL が設定されていません。\n" +
+                             "Renderダッシュボードで以下を確認してください:\n" +
+                             "1. PostgreSQLサービスが作成されているか\n" +
+                             "2. 環境変数 DATABASE_URL が設定されているか\n" +
+                             "3. DATABASE_URL の形式: postgres://user:pass@host:port/db";
+            System.err.println(errorMsg);
+            throw new RuntimeException(errorMsg);
+        }
+        
+        if (username == null || username.trim().isEmpty()) {
+            String errorMsg = "❌ DB_USERNAME が設定されていません。\n" +
+                             "Renderダッシュボードの環境変数で DB_USERNAME を設定してください。";
+            System.err.println(errorMsg);
+            throw new RuntimeException(errorMsg);
+        }
+        
+        if (password == null || password.trim().isEmpty()) {
+            String errorMsg = "❌ DB_PASSWORD が設定されていません。\n" +
+                             "Renderダッシュボードの環境変数で DB_PASSWORD を設定してください。";
+            System.err.println(errorMsg);
+            throw new RuntimeException(errorMsg);
         }
 
-        try {
-            HikariConfig config = new HikariConfig();
-            
-            // 最もシンプルな設定
-            config.setJdbcUrl(databaseUrl);
-            config.setUsername(username);
-            config.setPassword(password);
-            config.setDriverClassName("org.postgresql.Driver");
-            
-            // 最小限のプール設定
-            config.setMaximumPoolSize(1);
-            config.setMinimumIdle(1);
-            config.setConnectionTimeout(30000); // 30秒
-            config.setValidationTimeout(10000); // 10秒
-            config.setInitializationFailTimeout(60000); // 1分
-            
-            System.out.println("データソース作成試行中...");
-            HikariDataSource dataSource = new HikariDataSource(config);
-            
-            System.out.println("接続テスト実行中...");
-            try (var conn = dataSource.getConnection()) {
-                System.out.println("✅ データベース接続成功！");
-                var metadata = conn.getMetaData();
-                System.out.println("  製品名: " + metadata.getDatabaseProductName());
-                System.out.println("  バージョン: " + metadata.getDatabaseProductVersion());
-                System.out.println("  URL: " + metadata.getURL());
-                return dataSource;
+        return createDataSourceWithRetry(databaseUrl, username, password);
+    }
+    
+    /**
+     * リトライ機能付きデータソース作成
+     */
+    private DataSource createDataSourceWithRetry(String databaseUrl, String username, String password) {
+        int maxRetries = 3;
+        long retryDelay = 2000; // 2秒
+        
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                System.out.println("データベース接続試行 " + attempt + "/" + maxRetries);
+                return createDataSource(databaseUrl, username, password);
+            } catch (Exception e) {
+                System.err.println("❌ 接続試行 " + attempt + " 失敗: " + e.getMessage());
+                
+                if (attempt < maxRetries) {
+                    System.out.println("⏳ " + (retryDelay / 1000) + "秒後に再試行します...");
+                    try {
+                        Thread.sleep(retryDelay);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException("データベース接続の再試行が中断されました", ie);
+                    }
+                } else {
+                    System.err.println("❌ 全ての接続試行が失敗しました");
+                    throw new RuntimeException("データベース接続に失敗しました（" + maxRetries + "回試行）", e);
+                }
             }
-            
-        } catch (Exception e) {
-            System.err.println("❌ データベース接続失敗:");
-            System.err.println("  エラータイプ: " + e.getClass().getSimpleName());
-            System.err.println("  エラーメッセージ: " + e.getMessage());
-            
-            if (e.getCause() != null) {
-                System.err.println("  根本原因: " + e.getCause().getClass().getSimpleName());
-                System.err.println("  根本原因メッセージ: " + e.getCause().getMessage());
-            }
-            
-            // スタックトレースの最初の数行のみ表示
-            StackTraceElement[] stackTrace = e.getStackTrace();
-            System.err.println("  スタックトレース（抜粋）:");
-            for (int i = 0; i < Math.min(5, stackTrace.length); i++) {
-                System.err.println("    " + stackTrace[i]);
-            }
-            
-            throw new RuntimeException("データベース接続に失敗しました。詳細は上記ログを確認してください。", e);
         }
+        
+        throw new RuntimeException("予期しないエラー: データソース作成に失敗");
+    }
+    
+    /**
+     * データソース作成の実際の処理
+     */
+    private DataSource createDataSource(String databaseUrl, String username, String password) throws Exception {
+        System.out.println("HikariCP設定作成中...");
+        
+        HikariConfig config = new HikariConfig();
+        
+        // 基本接続設定
+        config.setJdbcUrl(databaseUrl);
+        config.setUsername(username);
+        config.setPassword(password);
+        config.setDriverClassName("org.postgresql.Driver");
+        
+        // 接続プール設定（本番環境用に最適化）
+        config.setMaximumPoolSize(2);  // 小規模アプリ用
+        config.setMinimumIdle(1);
+        config.setConnectionTimeout(30000);     // 30秒
+        config.setValidationTimeout(5000);      // 5秒
+        config.setIdleTimeout(300000);          // 5分
+        config.setMaxLifetime(1800000);         // 30分
+        config.setInitializationFailTimeout(60000); // 1分
+        
+        // 接続検証設定
+        config.setConnectionTestQuery("SELECT 1");
+        
+        // PostgreSQL固有の設定
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        
+        System.out.println("HikariDataSource作成中...");
+        HikariDataSource dataSource = new HikariDataSource(config);
+        
+        // 接続テスト実行
+        System.out.println("接続テスト実行中...");
+        try (var conn = dataSource.getConnection()) {
+            System.out.println("✅ データベース接続成功！");
+            var metadata = conn.getMetaData();
+            System.out.println("  製品名: " + metadata.getDatabaseProductName());
+            System.out.println("  バージョン: " + metadata.getDatabaseProductVersion());
+            System.out.println("  URL: " + maskUrl(metadata.getURL()));
+            System.out.println("  ドライバー: " + metadata.getDriverName() + " " + metadata.getDriverVersion());
+            return dataSource;
+        }
+    }
+    
+    /**
+     * URLのパスワード部分をマスク
+     */
+    private String maskUrl(String url) {
+        if (url == null) return null;
+        return url.replaceAll("://[^:]+:[^@]+@", "://***:***@");
     }
 }
