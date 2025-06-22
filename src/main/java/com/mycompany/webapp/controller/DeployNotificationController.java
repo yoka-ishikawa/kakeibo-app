@@ -137,10 +137,11 @@ public class DeployNotificationController {
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
 
             // 詳細ログ付きLINE通知送信
-            notificationService.sendDeployFailureNotificationWithLog(serviceName, commitId, errorLog,
-                    deployTime);
+            notificationService.sendDeployFailureNotificationWithLog(serviceName, commitId,
+                    errorLog, deployTime);
 
-            return ResponseEntity.ok(Map.of("status", "success", "message", "詳細ログ付きデプロイ失敗通知を送信しました"));
+            return ResponseEntity
+                    .ok(Map.of("status", "success", "message", "詳細ログ付きデプロイ失敗通知を送信しました"));
         } catch (Exception e) {
             System.err.println("詳細ログ付きデプロイ失敗通知エラー: " + e.getMessage());
             e.printStackTrace();

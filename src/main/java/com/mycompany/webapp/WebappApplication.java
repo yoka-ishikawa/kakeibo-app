@@ -33,14 +33,15 @@ public class WebappApplication {
 
     System.out.println("システム情報:");
     System.out.println("  Java Version: " + System.getProperty("java.version"));
-    System.out.println("============================");    try {
+    System.out.println("============================");
+    try {
       SpringApplication.run(WebappApplication.class, args);
       System.out.println("✅ アプリケーション起動成功");
     } catch (Exception e) {
       System.err.println("❌ アプリケーション起動失敗");
       System.err.println("エラータイプ: " + e.getClass().getSimpleName());
       System.err.println("エラーメッセージ: " + e.getMessage());
-      
+
       // プロダクション環境でのみデプロイ失敗通知を準備
       String activeProfile = System.getenv("SPRING_PROFILES_ACTIVE");
       if ("production".equals(activeProfile)) {
@@ -48,17 +49,17 @@ public class WebappApplication {
         System.err.println("サービス名: " + System.getenv("RENDER_SERVICE_NAME"));
         System.err.println("エラー詳細: " + e.getMessage());
         System.err.println("スタックトレースの先頭5行:");
-        
+
         StackTraceElement[] stackTrace = e.getStackTrace();
         for (int i = 0; i < Math.min(5, stackTrace.length); i++) {
           System.err.println("  " + stackTrace[i]);
         }
-        
+
         System.err.println("========================");
         System.err.println("🔔 この情報をもとに、外部からデプロイ失敗通知を送信してください");
         System.err.println("エンドポイント: POST /api/deploy/failure-with-log");
       }
-      
+
       // エラーを再スローして正常にアプリケーションを終了
       throw new RuntimeException("アプリケーション起動に失敗しました", e);
     }

@@ -15,7 +15,9 @@ public class NotificationService {
             String deployTime) {
         String message = createSuccessFlexMessage(serviceName, commitId, deployTime);
         sendLineMessage(message);
-    }    /**
+    }
+
+    /**
      * デプロイ失敗通知をLINEで送信
      */
     public void sendDeployFailureNotification(String serviceName, String commitId,
@@ -30,7 +32,8 @@ public class NotificationService {
     public void sendDeployFailureNotificationWithLog(String serviceName, String commitId,
             String errorLog, String deployTime) {
         String analyzedError = analyzeDeploymentError(errorLog);
-        String message = createFailureFlexMessageWithAnalysis(serviceName, commitId, analyzedError, errorLog, deployTime);
+        String message = createFailureFlexMessageWithAnalysis(serviceName, commitId, analyzedError,
+                errorLog, deployTime);
         sendLineMessage(message);
     }
 
@@ -50,7 +53,9 @@ public class NotificationService {
             String port) {
         String message = createApplicationStartedFlexMessage(timestamp, environment, port);
         sendLineMessage(message);
-    }    /**
+    }
+
+    /**
      * LINE Bot MCPを使用してブロードキャストメッセージを送信
      */
     private void sendLineMessage(String flexMessage) {
@@ -60,16 +65,16 @@ public class NotificationService {
             System.out.println("=== LINE ブロードキャストメッセージ送信 ===");
             System.out.println("メッセージ内容: " + flexMessage);
             System.out.println("============================================");
-            
+
             // 実際の送信処理は外部のMCPクライアントが実行
             // ここではログ出力のみ行い、実際の送信は別途実装
-            
+
         } catch (Exception e) {
             System.err.println("LINE通知準備エラー: " + e.getMessage());
             e.printStackTrace();
         }
     }
-    
+
     /**
      * デプロイ失敗の詳細ログを解析してエラー要因を特定
      */
@@ -77,36 +82,36 @@ public class NotificationService {
         if (errorLog == null || errorLog.isEmpty()) {
             return "不明なエラー";
         }
-        
+
         // PostgreSQL接続エラーの検出
         if (errorLog.contains("java.io.EOFException") && errorLog.contains("postgresql")) {
             return "PostgreSQL SSL接続エラー (EOFException)";
         }
-        
+
         if (errorLog.contains("Connection refused")) {
             return "データベース接続拒否";
         }
-        
+
         if (errorLog.contains("UnknownHostException")) {
             return "データベースホスト名解決エラー";
         }
-        
+
         if (errorLog.contains("SocketTimeoutException")) {
             return "データベース接続タイムアウト";
         }
-        
+
         if (errorLog.contains("BeanCreationException")) {
             return "Spring Bean作成エラー";
         }
-        
+
         if (errorLog.contains("DataSourceBeanCreationException")) {
             return "データソース設定エラー";
         }
-        
+
         if (errorLog.contains("sslmode")) {
             return "SSL接続設定問題";
         }
-        
+
         return "アプリケーション起動エラー";
     }
 
@@ -522,152 +527,154 @@ public class NotificationService {
     /**
      * デプロイ失敗用のFlexメッセージを作成（詳細解析付き）
      */
-    private String createFailureFlexMessageWithAnalysis(String serviceName, String commitId, String analyzedError, String errorLog, String deployTime) {
+    private String createFailureFlexMessageWithAnalysis(String serviceName, String commitId,
+            String analyzedError, String errorLog, String deployTime) {
         // エラーログを最初の5行に制限
         String truncatedLog = truncateErrorLog(errorLog, 5);
-        
+
         return String.format("""
-            {
-              "altText": "❌ デプロイ失敗 - %s",
-              "contents": {
-                "type": "bubble",
-                "size": "mega",
-                "header": {
-                  "type": "box",
-                  "layout": "vertical",
-                  "backgroundColor": "#e74c3c",
-                  "paddingTop": "16px",
-                  "paddingBottom": "16px",
-                  "contents": [
-                    {
-                      "type": "text",
-                      "text": "❌ デプロイ失敗",
-                      "color": "#ffffff",
-                      "size": "lg",
-                      "weight": "bold"
-                    },
-                    {
-                      "type": "text",
-                      "text": "%s",
-                      "color": "#ffffff",
-                      "size": "sm"
-                    }
-                  ]
-                },
-                "body": {
-                  "type": "box",
-                  "layout": "vertical",
-                  "spacing": "md",
-                  "paddingAll": "16px",
-                  "contents": [
-                    {
+                {
+                  "altText": "❌ デプロイ失敗 - %s",
+                  "contents": {
+                    "type": "bubble",
+                    "size": "mega",
+                    "header": {
                       "type": "box",
                       "layout": "vertical",
-                      "spacing": "xs",
+                      "backgroundColor": "#e74c3c",
+                      "paddingTop": "16px",
+                      "paddingBottom": "16px",
                       "contents": [
                         {
                           "type": "text",
-                          "text": "🔍 エラー解析",
-                          "size": "sm",
-                          "weight": "bold",
+                          "text": "❌ デプロイ失敗",
+                          "color": "#ffffff",
+                          "size": "lg",
+                          "weight": "bold"
+                        },
+                        {
+                          "type": "text",
+                          "text": "%s",
+                          "color": "#ffffff",
+                          "size": "sm"
+                        }
+                      ]
+                    },
+                    "body": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "md",
+                      "paddingAll": "16px",
+                      "contents": [
+                        {
+                          "type": "box",
+                          "layout": "vertical",
+                          "spacing": "xs",
+                          "contents": [
+                            {
+                              "type": "text",
+                              "text": "🔍 エラー解析",
+                              "size": "sm",
+                              "weight": "bold",
+                              "color": "#e74c3c"
+                            },
+                            {
+                              "type": "text",
+                              "text": "%s",
+                              "size": "xs",
+                              "wrap": true,
+                              "margin": "sm",
+                              "color": "#c0392b"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "separator",
+                          "margin": "md"
+                        },
+                        {
+                          "type": "box",
+                          "layout": "vertical",
+                          "spacing": "xs",
+                          "contents": [
+                            {
+                              "type": "text",
+                              "text": "📋 デプロイ情報",
+                              "size": "sm",
+                              "weight": "bold",
+                              "color": "#2c3e50"
+                            },
+                            {
+                              "type": "text",
+                              "text": "• サービス: %s\\n• コミット: %s\\n• 失敗時刻: %s",
+                              "size": "xs",
+                              "wrap": true,
+                              "margin": "sm"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "separator",
+                          "margin": "md"
+                        },
+                        {
+                          "type": "box",
+                          "layout": "vertical",
+                          "spacing": "xs",
+                          "contents": [
+                            {
+                              "type": "text",
+                              "text": "🔧 エラーログ (抜粋)",
+                              "size": "sm",
+                              "weight": "bold",
+                              "color": "#7f8c8d"
+                            },
+                            {
+                              "type": "text",
+                              "text": "%s",
+                              "size": "xxs",
+                              "wrap": true,
+                              "margin": "sm",
+                              "color": "#95a5a6"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "separator",
+                          "margin": "md"
+                        },
+                        {
+                          "type": "text",
+                          "text": "🚨 すぐに環境変数とデータベース接続設定を確認し、再デプロイを実行してください。",
+                          "size": "xs",
+                          "color": "#e67e22",
+                          "wrap": true,
+                          "margin": "md"
+                        }
+                      ]
+                    },
+                    "footer": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "xs",
+                      "paddingAll": "12px",
+                      "contents": [
+                        {
+                          "type": "button",
+                          "action": {
+                            "type": "uri",
+                            "label": "Renderログを確認",
+                            "uri": "https://dashboard.render.com"
+                          },
+                          "style": "primary",
                           "color": "#e74c3c"
-                        },
-                        {
-                          "type": "text",
-                          "text": "%s",
-                          "size": "xs",
-                          "wrap": true,
-                          "margin": "sm",
-                          "color": "#c0392b"
                         }
                       ]
-                    },
-                    {
-                      "type": "separator",
-                      "margin": "md"
-                    },
-                    {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "xs",
-                      "contents": [
-                        {
-                          "type": "text",
-                          "text": "📋 デプロイ情報",
-                          "size": "sm",
-                          "weight": "bold",
-                          "color": "#2c3e50"
-                        },
-                        {
-                          "type": "text",
-                          "text": "• サービス: %s\\n• コミット: %s\\n• 失敗時刻: %s",
-                          "size": "xs",
-                          "wrap": true,
-                          "margin": "sm"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "separator",
-                      "margin": "md"
-                    },
-                    {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "xs",
-                      "contents": [
-                        {
-                          "type": "text",
-                          "text": "🔧 エラーログ (抜粋)",
-                          "size": "sm",
-                          "weight": "bold",
-                          "color": "#7f8c8d"
-                        },
-                        {
-                          "type": "text",
-                          "text": "%s",
-                          "size": "xxs",
-                          "wrap": true,
-                          "margin": "sm",
-                          "color": "#95a5a6"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "separator",
-                      "margin": "md"
-                    },
-                    {
-                      "type": "text",
-                      "text": "🚨 すぐに環境変数とデータベース接続設定を確認し、再デプロイを実行してください。",
-                      "size": "xs",
-                      "color": "#e67e22",
-                      "wrap": true,
-                      "margin": "md"
                     }
-                  ]
-                },
-                "footer": {
-                  "type": "box",
-                  "layout": "vertical",
-                  "spacing": "xs",
-                  "paddingAll": "12px",
-                  "contents": [
-                    {
-                      "type": "button",
-                      "action": {
-                        "type": "uri",
-                        "label": "Renderログを確認",
-                        "uri": "https://dashboard.render.com"
-                      },
-                      "style": "primary",
-                      "color": "#e74c3c"
-                    }
-                  ]
+                  }
                 }
-              }
-            }
-            """, serviceName, serviceName, analyzedError, serviceName, commitId, deployTime, truncatedLog);
+                """, serviceName, serviceName, analyzedError, serviceName, commitId, deployTime,
+                truncatedLog);
     }
 
     /**
@@ -677,18 +684,18 @@ public class NotificationService {
         if (errorLog == null || errorLog.isEmpty()) {
             return "ログが取得できませんでした";
         }
-        
+
         String[] lines = errorLog.split("\n");
         if (lines.length <= maxLines) {
             return errorLog;
         }
-        
+
         StringBuilder truncated = new StringBuilder();
         for (int i = 0; i < maxLines; i++) {
             truncated.append(lines[i]).append("\n");
         }
         truncated.append("... (以下 ").append(lines.length - maxLines).append(" 行省略)");
-        
+
         return truncated.toString();
     }
 }
