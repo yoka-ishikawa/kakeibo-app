@@ -55,15 +55,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const balance = totalIncome - totalExpenditure;
 
       // レポート表示を更新
-      document.querySelector(
-        ".income"
-      ).textContent = `収入: ¥ ${totalIncome.toLocaleString()}`;
-      document.querySelector(
-        ".expenditure"
-      ).textContent = `支出: ¥ ${totalExpenditure.toLocaleString()}`;
-      document.querySelector(
-        ".income-expenditure"
-      ).textContent = `収支: ¥ ${balance.toLocaleString()}`;
+      document.querySelector(".income").textContent =
+        `収入: ¥ ${totalIncome.toLocaleString()}`;
+      document.querySelector(".expenditure").textContent =
+        `支出: ¥ ${totalExpenditure.toLocaleString()}`;
+      document.querySelector(".income-expenditure").textContent =
+        `収支: ¥ ${balance.toLocaleString()}`;
 
       // テーブルを更新
       const tbody = document.querySelector("tbody");

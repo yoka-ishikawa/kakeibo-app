@@ -1,21 +1,18 @@
 package com.mycompany.webapp.model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-/**
- * 家計簿情報管理エンティティ Supabaseのtb_info_kanriテーブルにマッピング
- */
+/** 家計簿情報管理エンティティ Supabaseのtb_info_kanriテーブルにマッピング */
 @Entity
 @Table(name = "tb_info_kanri")
 public class Infokanri {
@@ -35,6 +32,7 @@ public class Infokanri {
 
   @Column(name = "naisyo")
   private String naisyo;
+
   @Column(name = "hiduke", nullable = false)
   @JsonFormat(pattern = "yyyy-MM-dd")
   private LocalDate hiduke;
@@ -64,8 +62,8 @@ public class Infokanri {
   public Infokanri() {}
 
   // 引数付きコンストラクタ
-  public Infokanri(String userId, String syubetu, Integer kingaku, String naisyo,
-      LocalDate hiduke) {
+  public Infokanri(
+      String userId, String syubetu, Integer kingaku, String naisyo, LocalDate hiduke) {
     this.userId = userId;
     this.syubetu = syubetu;
     this.kingaku = kingaku;
@@ -140,8 +138,26 @@ public class Infokanri {
 
   @Override
   public String toString() {
-    return "Infokanri{" + "id=" + id + ", userId='" + userId + '\'' + ", syubetu='" + syubetu + '\''
-        + ", kingaku=" + kingaku + ", naisyo='" + naisyo + '\'' + ", hiduke=" + hiduke
-        + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+    return "Infokanri{"
+        + "id="
+        + id
+        + ", userId='"
+        + userId
+        + '\''
+        + ", syubetu='"
+        + syubetu
+        + '\''
+        + ", kingaku="
+        + kingaku
+        + ", naisyo='"
+        + naisyo
+        + '\''
+        + ", hiduke="
+        + hiduke
+        + ", createdAt="
+        + createdAt
+        + ", updatedAt="
+        + updatedAt
+        + '}';
   }
 }
