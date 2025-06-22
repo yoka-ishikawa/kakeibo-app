@@ -225,15 +225,32 @@ document
             "X-User-Id": userId, // X-User-Token → X-User-Id
           },
           body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-          console.error("登録に失敗:", JSON.stringify(response, null, 2));
-          throw new Error("登録に失敗しました。");
+        });        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("登録に失敗:", {
+            status: response.status,
+            statusText: response.statusText,
+            errorText: errorText
+          });
+          throw new Error(`登録に失敗しました。ステータス: ${response.status}, メッセージ: ${errorText}`);
         }
 
         // 登録/更新成功時の処理
-        const result = await response.json();
+        const responseText = await response.text();
+        console.log("サーバーレスポンス:", responseText);
+        
+        let result;
+        if (responseText) {
+          try {
+            result = JSON.parse(responseText);
+          } catch (parseError) {
+            console.warn("JSONパースエラー:", parseError);
+            result = { message: responseText };
+          }
+        } else {
+          result = { message: "登録が完了しました" };
+        }
+        
         console.log(isEditMode ? "更新成功:" : "登録成功:", result);
       } catch (error) {
         console.error(isEditMode ? "更新エラー:" : "登録エラー:", error);

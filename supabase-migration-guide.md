@@ -1,9 +1,10 @@
-# Supabaseテーブル設定ガイド
+# Supabase テーブル設定ガイド
 
-## 1. Supabaseでテーブル作成
+## 1. Supabase でテーブル作成
 
 ### ダッシュボードでの手順
-1. Supabaseダッシュボードにログイン
+
+1. Supabase ダッシュボードにログイン
 2. プロジェクト `kakeibo-db` を選択
 3. 左メニューから「Table Editor」を選択
 4. 「Create a new table」をクリック
@@ -23,8 +24,9 @@
 | created_at | timestamptz | | now() |
 | updated_at | timestamptz | | now() |
 
-### SQLコマンドでの作成
-または、「SQL Editor」で以下のSQLを実行：
+### SQL コマンドでの作成
+
+または、「SQL Editor」で以下の SQL を実行：
 
 ```sql
 -- 既存テーブルがある場合は削除（注意：データも削除されます）
@@ -59,15 +61,17 @@ INSERT INTO tb_info_kanri (user_id, syubetu, kingaku, naisyo, hiduke) VALUES
 
 ## 2. RLS（Row Level Security）設定
 
-Supabaseでは、デフォルトでRLSが有効になっている場合があります。
+Supabase では、デフォルトで RLS が有効になっている場合があります。
 アプリケーションが正常に動作するよう、適切なポリシーを設定してください。
 
-### RLSを無効にする場合（テスト用）
+### RLS を無効にする場合（テスト用）
+
 ```sql
 ALTER TABLE tb_info_kanri DISABLE ROW LEVEL SECURITY;
 ```
 
-### RLSを有効にして適切なポリシーを設定する場合
+### RLS を有効にして適切なポリシーを設定する場合
+
 ```sql
 -- RLSを有効化
 ALTER TABLE tb_info_kanri ENABLE ROW LEVEL SECURITY;
@@ -79,16 +83,17 @@ CREATE POLICY "Allow all operations" ON tb_info_kanri FOR ALL USING (true);
 ## 3. 接続確認
 
 ### テーブル確認
+
 ```sql
 -- テーブル構造確認
-SELECT 
-    table_name, 
-    column_name, 
-    data_type, 
-    is_nullable, 
+SELECT
+    table_name,
+    column_name,
+    data_type,
+    is_nullable,
     column_default
-FROM information_schema.columns 
-WHERE table_name = 'tb_info_kanri' 
+FROM information_schema.columns
+WHERE table_name = 'tb_info_kanri'
 ORDER BY ordinal_position;
 
 -- データ確認
@@ -97,7 +102,8 @@ SELECT * FROM tb_info_kanri ORDER BY hiduke DESC, id DESC LIMIT 10;
 
 ## 4. アプリケーション設定
 
-### Render環境変数（最新版）
+### Render 環境変数（最新版）
+
 ```bash
 SPRING_PROFILES_ACTIVE=production
 DATABASE_URL=jdbc:postgresql://db.gwtjqewcrchqjsywvqjc.supabase.co:5432/postgres?sslmode=require
@@ -110,6 +116,7 @@ JPA_DIALECT=org.hibernate.dialect.PostgreSQLDialect
 ## 5. 変更点まとめ
 
 ### データベーススキーマ
+
 - テーブル名: `tb_info_kanri` (変更なし)
 - カラム変更:
   - `user_token` → `user_id`
@@ -119,20 +126,22 @@ JPA_DIALECT=org.hibernate.dialect.PostgreSQLDialect
   - `amount` → `kingaku`
   - `update_date_time` → `created_at`, `updated_at`
 
-### APIエンドポイント
+### API エンドポイント
+
 - エンドポイント: `/api/infokanri` (変更なし)
 - リクエストヘッダー: `X-User-Token` → `X-User-Id`
 - リクエストボディ: 上記カラム変更に対応
 
 ### フロントエンド
-- JavaScriptファイル更新: `inexpen.js`, `list.js`, `report.js`
-- ユーザートークン → ユーザーIDに変更
-- APIペイロード形式を新しいテーブル構造に対応
+
+- JavaScript ファイル更新: `inexpen.js`, `list.js`, `report.js`
+- ユーザートークン → ユーザー ID に変更
+- API ペイロード形式を新しいテーブル構造に対応
 
 ## 6. テスト手順
 
-1. Supabaseでテーブル作成
-2. Render環境変数更新
+1. Supabase でテーブル作成
+2. Render 環境変数更新
 3. アプリケーション再デプロイ
 4. 収支登録画面でデータ登録テスト
 5. 一覧画面でデータ表示確認
@@ -141,7 +150,8 @@ JPA_DIALECT=org.hibernate.dialect.PostgreSQLDialect
 ## 7. トラブルシューティング
 
 ### よくある問題
-- **RLSエラー**: ポリシー設定を確認
+
+- **RLS エラー**: ポリシー設定を確認
 - **接続エラー**: 環境変数の形式を確認
 - **データが表示されない**: テーブル名・カラム名を確認
-- **文字化け**: UTF-8設定を確認
+- **文字化け**: UTF-8 設定を確認

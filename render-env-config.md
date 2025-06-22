@@ -1,83 +1,96 @@
-# Render環境変数設定（Render PostgreSQL用）
+# Render 環境変数設定（Render PostgreSQL 用）
 
 ## 必須環境変数
 
 ### DATABASE_URL
+
 ```
 jdbc:postgresql://dpg-d1j8h7he5dus7396aujg-a.singapore-postgres.render.com:5432/kakeibo_db?sslmode=require&connectTimeout=30&socketTimeout=30&loginTimeout=30
 ```
 
 ### DB_DRIVER
+
 ```
 org.postgresql.Driver
 ```
 
 ### DB_USERNAME
+
 ```
 kakeibo_user
 ```
 
 ### DB_PASSWORD
+
 ```
 LgjAtV1TaR5Uwot2ecX9fhi5UfDFqek3
 ```
 
 ### JPA_DIALECT
+
 ```
 org.hibernate.dialect.PostgreSQLDialect
 ```
 
 ### SPRING_PROFILES_ACTIVE
+
 ```
 production
 ```
 
 ### PORT
+
 ```
 10000
 ```
 
 ### DDL_AUTO
+
 ```
 none
 ```
 
 ### SHOW_SQL
+
 ```
 true
 ```
 
 ### SQL_INIT_MODE
+
 ```
 never
 ```
 
 ## 設定手順
 
-1. Renderダッシュボードでサービスを選択
+1. Render ダッシュボードでサービスを選択
 2. Environment タブを開く
 3. 上記の環境変数を一つずつ追加/修正
 4. Deploy latest commit をクリックして再デプロイ
 
 ## 注意点
 
-- DATABASE_URLには認証情報（ユーザー名・パスワード）を含めない
-- 認証情報は別途DB_USERNAME, DB_PASSWORDで設定
-- Render PostgreSQLのポートは5432
-- SSL接続必須のため `sslmode=require` を追加
+- DATABASE_URL には認証情報（ユーザー名・パスワード）を含めない
+- 認証情報は別途 DB_USERNAME, DB_PASSWORD で設定
+- Render PostgreSQL のポートは 5432
+- SSL 接続必須のため `sslmode=require` を追加
 
-## Render PostgreSQLでのテーブル作成
+## Render PostgreSQL でのテーブル作成
 
-Renderダッシュボードから以下の手順でテーブルを作成：
+Render ダッシュボードから以下の手順でテーブルを作成：
 
 1. **データベース接続**
-   - Renderダッシュボード → `kakeibo-db` → Connect
-   - またはPSQLコマンドを使用:
+
+   - Render ダッシュボード → `kakeibo-db` → Connect
+   - または PSQL コマンドを使用:
+
    ```bash
    PGPASSWORD=LgjAtV1TaR5Uwot2ecX9fhi5UfDFqek3 psql -h dpg-d12hm7je5dus7396aujg-a.singapore-postgres.render.com -U kakeibo_user tb_info_kanri
    ```
 
-2. **テーブル作成SQL実行**
+2. **テーブル作成 SQL 実行**
+
    ```sql
    -- 家計簿情報管理テーブル
    CREATE TABLE IF NOT EXISTS tb_info_kanri (
@@ -99,7 +112,8 @@ Renderダッシュボードから以下の手順でテーブルを作成：
 
 ## 代替設定（接続問題が続く場合）
 
-### DATABASE_URLの代替形式
+### DATABASE_URL の代替形式
+
 ```
 # オプション1: 接続タイムアウト設定付き
 jdbc:postgresql://dpg-d12hm7je5dus7396aujg-a.singapore-postgres.render.com:5432/tb_info_kanri?sslmode=require&connectTimeout=10&socketTimeout=10
@@ -109,34 +123,42 @@ jdbc:postgresql://dpg-d12hm7je5dus7396aujg-a.singapore-postgres.render.com:5432/
 ```
 
 ### トラブルシューティング手順
-1. Renderダッシュボードで接続情報を再確認
+
+1. Render ダッシュボードで接続情報を再確認
 2. パスワードが正しいか確認
-3. Renderデータベースの状態を確認
-4. 必要に応じてRenderサービスを再起動
+3. Render データベースの状態を確認
+4. 必要に応じて Render サービスを再起動
 
 ### 一時的な回避策
-問題が続く場合は、一時的にH2データベースで動作確認：
+
+問題が続く場合は、一時的に H2 データベースで動作確認：
+
 ```
 SPRING_PROFILES_ACTIVE=
 ```
-（productionプロファイルを無効にしてH2使用）
+
+（production プロファイルを無効にして H2 使用）
 
 ## 接続トラブルシューティング用設定
 
 ### 接続診断のための一時的な環境変数
+
 **注意: 接続確認後は削除すること**
 
 ### LOGGING_LEVEL_COM_ZAXXER_HIKARI
+
 ```
 DEBUG
 ```
 
 ### LOGGING_LEVEL_ORG_POSTGRESQL
+
 ```
 DEBUG
 ```
 
 ### SPRING_JPA_SHOW_SQL
+
 ```
 true
 ```
@@ -144,18 +166,21 @@ true
 ## 接続エラー対応手順
 
 1. **環境変数の確認**
-   - 上記すべての環境変数が正しく設定されているか確認
-   - 特にDATABASE_URL, DB_USERNAME, DB_PASSWORDの値をチェック
 
-2. **Render PostgreSQLサービスの状態確認**
-   - Renderダッシュボードで`kakeibo-db`サービスが"Available"状態か確認
+   - 上記すべての環境変数が正しく設定されているか確認
+   - 特に DATABASE_URL, DB_USERNAME, DB_PASSWORD の値をチェック
+
+2. **Render PostgreSQL サービスの状態確認**
+
+   - Render ダッシュボードで`kakeibo-db`サービスが"Available"状態か確認
    - 接続情報が変更されていないか確認
 
 3. **段階的デプロイ**
-   - まず接続のみテスト（schema.sqlは無効）
+
+   - まず接続のみテスト（schema.sql は無効）
    - 接続成功後、手動でテーブル作成
    - 最後にアプリケーション機能をテスト
 
 4. **接続情報の再確認**
-   - RenderのPostgreSQLダッシュボードで最新の接続情報を確認
+   - Render の PostgreSQL ダッシュボードで最新の接続情報を確認
    - 接続文字列、ユーザー名、パスワードが正確かチェック

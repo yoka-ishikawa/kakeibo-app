@@ -1,10 +1,10 @@
 # Render PostgreSQL 完全設定ガイド
 
-## ステップ1: Render環境変数設定
+## ステップ 1: Render 環境変数設定
 
-### 必要な環境変数（kakeibo-appサービス）
+### 必要な環境変数（kakeibo-app サービス）
 
-以下の環境変数をRenderダッシュボード（Environment タブ）で設定：
+以下の環境変数を Render ダッシュボード（Environment タブ）で設定：
 
 ```bash
 # データベース接続情報
@@ -20,21 +20,23 @@ PORT=10000
 ```
 
 ### 設定手順
-1. Renderダッシュボード → kakeibo-app サービス → Environment タブ
+
+1. Render ダッシュボード → kakeibo-app サービス → Environment タブ
 2. 上記の環境変数を一つずつ設定
 3. 「Save Changes」をクリック
 
-## ステップ2: データベースにテーブル作成
+## ステップ 2: データベースにテーブル作成
 
-### 方法1: Renderダッシュボードから（推奨）
+### 方法 1: Render ダッシュボードから（推奨）
 
 1. **接続**
-   - Renderダッシュボード → `kakeibo-db` データベース
+
+   - Render ダッシュボード → `kakeibo-db` データベース
    - 「Connect」ボタンをクリック
    - Web SQL エディタが開きます
 
-2. **テーブル作成SQL実行**
-   以下のSQLをコピー＆ペーストして実行：
+2. **テーブル作成 SQL 実行**
+   以下の SQL をコピー＆ペーストして実行：
 
 ```sql
 -- 既存のテーブルを削除（必要に応じて）
@@ -72,21 +74,22 @@ INSERT INTO tb_info_kanri (user_id, syubetu, kingaku, naisyo, hiduke) VALUES
 SELECT * FROM tb_info_kanri ORDER BY hiduke DESC, id DESC;
 ```
 
-### 方法2: コマンドライン（上級者向け）
+### 方法 2: コマンドライン（上級者向け）
 
 ```bash
 PGPASSWORD=LgjAtV1TaR5Uwot2ecX9fhi5UfDFqek3 psql -h dpg-d12hm7je5dus7396aujg-a.singapore-postgres.render.com -U kakeibo_user tb_info_kanri
 ```
 
-## ステップ3: アプリケーション再デプロイ
+## ステップ 3: アプリケーション再デプロイ
 
-1. Renderダッシュボード → kakeibo-app サービス
+1. Render ダッシュボード → kakeibo-app サービス
 2. 「Deploy latest commit」ボタンをクリック
 3. デプロイログを確認
 
-## ステップ4: 動作確認
+## ステップ 4: 動作確認
 
 ### 期待される成功ログ
+
 ```
 HikariPool-1 - Starting...
 HikariPool-1 - Start completed.
@@ -94,6 +97,7 @@ Started WebappApplication in X.XXX seconds
 ```
 
 ### テスト手順
+
 1. **収支登録画面**: データ登録テスト
 2. **一覧画面**: 登録データ表示確認
 3. **レポート画面**: 集計機能確認
@@ -103,17 +107,20 @@ Started WebappApplication in X.XXX seconds
 ### よくあるエラーと対処法
 
 1. **接続エラー**
+
    - 環境変数の値にスペースが入っていないか確認
    - PASSWORD に特殊文字が含まれる場合はエスケープ確認
 
 2. **テーブルが見つからない**
-   - テーブル作成SQLが正常に実行されたか確認
+
+   - テーブル作成 SQL が正常に実行されたか確認
    - テーブル名の大文字小文字を確認
 
 3. **権限エラー**
    - kakeibo_user にテーブル作成権限があるか確認
 
 ### 確認コマンド
+
 ```sql
 -- テーブル一覧
 \dt
