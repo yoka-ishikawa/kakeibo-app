@@ -1,22 +1,19 @@
 package com.mycompany.webapp.config;
 
+import com.mycompany.webapp.service.NotificationService;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.sql.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.mycompany.webapp.service.NotificationService;
 
-import javax.sql.DataSource;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-/**
- * データベース設定（改良版・詳細エラーハンドリング付き） 環境変数の詳細チェックと段階的接続試行 JDBC URL認証情報の自動変換機能付き
- */
+/** データベース設定（改良版・詳細エラーハンドリング付き） 環境変数の詳細チェックと段階的接続試行 JDBC URL認証情報の自動変換機能付き */
 @Configuration
 @Profile("production")
 public class DatabaseConfig {
@@ -42,8 +39,7 @@ public class DatabaseConfig {
                 "  DATABASE_URL: " + (databaseUrl != null ? maskUrl(databaseUrl) : "❌ 未設定"));
         System.out.println(
                 "  DB_USERNAME: " + (username != null ? "✅ 設定済み (" + username + ")" : "❌ 未設定"));
-        System.out.println("  DB_PASSWORD: "
-                + (password != null ? "✅ 設定済み (長さ: " + password.length() + ")" : "❌ 未設定"));
+        System.out.println("  DB_PASSWORD: " + (password != null ? "✅ 設定済み" : "❌ 未設定"));
         System.out.println("  RENDER_SERVICE_NAME: " + renderServiceName);
         System.out.println("  SPRING_PROFILES_ACTIVE: " + springProfile);
 
@@ -84,9 +80,7 @@ public class DatabaseConfig {
         return createDataSourceWithRetry(databaseUrl, username, password);
     }
 
-    /**
-     * JDBC URLから認証情報を抽出し、標準形式に変換する user:pass@host:port/db → host:port/db + 別途認証情報
-     */
+    /** JDBC URLから認証情報を抽出し、標準形式に変換する user:pass@host:port/db → host:port/db + 別途認証情報 */
     private String[] extractAndFixCredentials(String url) {
         try {
             // 既にJDBC標準形式（認証情報が含まれていない）の場合はそのまま返す
@@ -126,9 +120,7 @@ public class DatabaseConfig {
         }
     }
 
-    /**
-     * JDBC URL変換の通知を送信
-     */
+    /** JDBC URL変換の通知を送信 */
     private void sendJdbcUrlConversionNotification(String username, String hostAndDb,
             String fixedUrl) {
         try {
@@ -152,9 +144,7 @@ public class DatabaseConfig {
         }
     }
 
-    /**
-     * リトライ機能付きデータソース作成
-     */
+    /** リトライ機能付きデータソース作成 */
     private DataSource createDataSourceWithRetry(String databaseUrl, String username,
             String password) {
         int maxRetries = 3;
@@ -196,9 +186,7 @@ public class DatabaseConfig {
         throw new RuntimeException("予期しないエラー: データソース作成に失敗");
     }
 
-    /**
-     * データソース作成の実際の処理
-     */
+    /** データソース作成の実際の処理 */
     private DataSource createDataSource(String databaseUrl, String username, String password)
             throws Exception {
         System.out.println("HikariCP設定作成中...");
@@ -275,9 +263,7 @@ public class DatabaseConfig {
         }
     }
 
-    /**
-     * 直接JDBC接続テスト（HikariCPを使わない詳細診断）
-     */
+    /** 直接JDBC接続テスト（HikariCPを使わない詳細診断） */
     private void testDirectJdbcConnection(String url, String username, String password) {
         System.out.println("直接JDBC接続を試行します...");
 
@@ -367,9 +353,7 @@ public class DatabaseConfig {
         }
     }
 
-    /**
-     * 接続エラーの詳細分析
-     */
+    /** 接続エラーの詳細分析 */
     private void analyzeConnectionError(java.sql.SQLException e) {
         String message = e.getMessage();
         String sqlState = e.getSQLState();
@@ -419,9 +403,7 @@ public class DatabaseConfig {
         }
     }
 
-    /**
-     * データベースURL解析と診断情報出力
-     */
+    /** データベースURL解析と診断情報出力 */
     private void analyzeAndLogDatabaseUrl(String databaseUrl) {
         System.out.println("データベースURL解析:");
         System.out.println("  完全URL: " + maskUrl(databaseUrl));
@@ -476,18 +458,14 @@ public class DatabaseConfig {
         }
     }
 
-    /**
-     * URLのパスワード部分をマスク
-     */
+    /** URLのパスワード部分をマスク */
     private String maskUrl(String url) {
         if (url == null)
             return null;
         return url.replaceAll("://[^:]+:[^@]+@", "://***:***@");
     }
 
-    /**
-     * データベースURLプロトコル自動修正 postgres:// または postgresql:// を jdbc:postgresql:// に変換
-     */
+    /** データベースURLプロトコル自動修正 postgres:// または postgresql:// を jdbc:postgresql:// に変換 */
     private String fixDatabaseUrlProtocol(String originalUrl) {
         System.out.println("=== DATABASE_URL プロトコル確認・修正 ===");
         System.out.println("元のURL: " + maskUrl(originalUrl));

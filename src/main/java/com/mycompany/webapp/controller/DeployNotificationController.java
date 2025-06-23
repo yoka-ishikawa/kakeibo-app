@@ -1,17 +1,14 @@
 package com.mycompany.webapp.controller;
 
 import com.mycompany.webapp.service.NotificationService;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-
-/**
- * Renderデプロイ通知用コントローラー Renderのデプロイフック機能と連携してLINE通知を送信
- */
+/** Renderデプロイ通知用コントローラー Renderのデプロイフック機能と連携してLINE通知を送信 */
 @RestController
 @RequestMapping("/api/deploy")
 public class DeployNotificationController {
@@ -19,15 +16,13 @@ public class DeployNotificationController {
     @Autowired
     private NotificationService notificationService;
 
-    /**
-     * Renderデプロイ成功通知
-     */
+    /** Renderデプロイ成功通知 */
     @PostMapping("/success")
     public ResponseEntity<Map<String, String>> deploySuccess(
             @RequestBody Map<String, Object> payload) {
         try {
             System.out.println("=== デプロイ成功通知受信 ===");
-            System.out.println("Payload: " + payload);
+            System.out.println("Payload received: " + payload.keySet());
 
             String serviceName = payload.getOrDefault("service", "家計簿アプリ").toString();
             String commitId = payload.getOrDefault("commit", "不明").toString();
@@ -46,15 +41,13 @@ public class DeployNotificationController {
         }
     }
 
-    /**
-     * Renderデプロイ失敗通知
-     */
+    /** Renderデプロイ失敗通知 */
     @PostMapping("/failure")
     public ResponseEntity<Map<String, String>> deployFailure(
             @RequestBody Map<String, Object> payload) {
         try {
             System.out.println("=== デプロイ失敗通知受信 ===");
-            System.out.println("Payload: " + payload);
+            System.out.println("Payload received: " + payload.keySet());
 
             String serviceName = payload.getOrDefault("service", "家計簿アプリ").toString();
             String commitId = payload.getOrDefault("commit", "不明").toString();
@@ -75,15 +68,13 @@ public class DeployNotificationController {
         }
     }
 
-    /**
-     * デプロイ開始通知
-     */
+    /** デプロイ開始通知 */
     @PostMapping("/started")
     public ResponseEntity<Map<String, String>> deployStarted(
             @RequestBody Map<String, Object> payload) {
         try {
             System.out.println("=== デプロイ開始通知受信 ===");
-            System.out.println("Payload: " + payload);
+            System.out.println("Payload received: " + payload.keySet());
 
             String serviceName = payload.getOrDefault("service", "家計簿アプリ").toString();
             String commitId = payload.getOrDefault("commit", "不明").toString();
@@ -102,9 +93,7 @@ public class DeployNotificationController {
         }
     }
 
-    /**
-     * 通知テスト用エンドポイント
-     */
+    /** 通知テスト用エンドポイント */
     @GetMapping("/test")
     public ResponseEntity<Map<String, String>> testNotification() {
         try {
@@ -120,15 +109,13 @@ public class DeployNotificationController {
         }
     }
 
-    /**
-     * デプロイ失敗通知（詳細ログ付き）
-     */
+    /** デプロイ失敗通知（詳細ログ付き） */
     @PostMapping("/failure-with-log")
     public ResponseEntity<Map<String, String>> deployFailureWithLog(
             @RequestBody Map<String, Object> payload) {
         try {
             System.out.println("=== デプロイ失敗通知（詳細ログ付き）受信 ===");
-            System.out.println("Payload: " + payload);
+            System.out.println("Payload received: " + payload.keySet());
 
             String serviceName = payload.getOrDefault("service", "家計簿アプリ").toString();
             String commitId = payload.getOrDefault("commit", "不明").toString();

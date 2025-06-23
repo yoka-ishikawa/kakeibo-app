@@ -1,4 +1,3 @@
-HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -31,4 +30,34 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Node.js (if needed in future) ###
+node_modules/
+package-lock.json
+npm-debug.log*
+
+### Temporary files and logs ###
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+### OS specific ###
+.DS_Store
+Thumbs.db
+
+### Node.js ###
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+### Prettier ###
+.prettier-cache
+
+### Deployment archives ###
 openjdk21.tar.gz

@@ -92,8 +92,8 @@ form p label {
 }
 
 /* 入力フィールドのスタイル */
-input[type="date"],
-input[type="number"],
+input[type='date'],
+input[type='number'],
 select {
   width: 100%; /* 入力フォームの幅を親要素に合わせる */
   max-width: 300px; /* 最大幅を設定 */
@@ -306,8 +306,8 @@ form p label {
   padding-right: 10px; /* 右側に余白 */
 }
 
-input[type="date"],
-input[type="number"],
+input[type='date'],
+input[type='number'],
 select {
   width: 100%; /* 入力フォームの幅を親要素に合わせる */
   max-width: none; /* 最大幅制限を削除 */
@@ -385,16 +385,16 @@ th {
 }
 
 /* 左寄せ・右寄せのカラムの固定 */
-th[fixed="left"],
-td[fixed="left"] {
+th[fixed='left'],
+td[fixed='left'] {
   position: sticky;
   left: 0;
   background-color: #fff; /* 固定された列の背景色 */
   z-index: 1;
 }
 
-th[fixed="right"],
-td[fixed="right"] {
+th[fixed='right'],
+td[fixed='right'] {
   position: sticky;
   right: 0;
   background-color: #fff; /* 固定された列の背景色 */
@@ -418,12 +418,12 @@ Button:hover {
 }
 
 /* ボタンの小さめスタイル */
-Button[size="s"] {
+Button[size='s'] {
   padding: 4px 8px;
   font-size: 12px;
 }
 
-td[fixed="right"] button {
+td[fixed='right'] button {
   text-align: center; /* 中央揃え */
   /* display: flex;*/
   display: flex;

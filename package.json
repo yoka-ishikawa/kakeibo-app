@@ -1,5 +1,17 @@
 {
-  "dependencies": {
-    "postgres": "^3.4.7"
+  "name": "kakeibo-app",
+  "version": "1.0.0",
+  "description": "日本の家計簿文化に基づいた収支管理Webアプリケーションです。Render環境での本格運用と自動監視・通知システムを搭載しています。",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write \"src/main/resources/static/**/*.{js,css,html}\"",
+    "format:check": "prettier --check \"src/main/resources/static/**/*.{js,css,html}\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^3.6.0"
   }
 }

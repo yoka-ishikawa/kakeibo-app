@@ -508,10 +508,10 @@ spring.jackson.time-zone=Asia/Tokyo
 #### Render Platform環境変数
 ```bash
 # データベース接続
-DATABASE_URL=jdbc:postgresql://dpg-xxx-a.singapore-postgres.render.com:5432/kakeibo_db_xxx?sslmode=require
+DATABASE_URL=jdbc:postgresql://[hostname]:5432/[database]?sslmode=require
 DB_DRIVER=org.postgresql.Driver
-DB_USERNAME=kakeibo_db_xxx_user
-DB_PASSWORD=xxx
+DB_USERNAME=[database_username]
+DB_PASSWORD=[database_password]
 JPA_DIALECT=org.hibernate.dialect.PostgreSQLDialect
 
 # Spring Boot設定
@@ -522,13 +522,13 @@ PORT=10000
 JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=50.0
 
 # 運用監視設定
-RENDER_SERVICE_ID=srv-d12hh8mmcj7s73fc6170
-RENDER_API_KEY=rnd_xxxxxxxxxxxxxxxxxxxxx
+RENDER_SERVICE_ID=[service_id]
+RENDER_API_KEY=[api_key]
 
 # LINE Bot設定
-LINE_CHANNEL_ACCESS_TOKEN=xxxxxxxxxxxxxxxxxxxxx
-LINE_CHANNEL_SECRET=xxxxxxxxxxxxxxxxxxxxx
-LINE_DESTINATION_USER_ID=Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+LINE_CHANNEL_ACCESS_TOKEN=[access_token]
+LINE_CHANNEL_SECRET=[channel_secret]
+LINE_DESTINATION_USER_ID=[user_id]
 ```
 
 ---

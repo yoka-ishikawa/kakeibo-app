@@ -2,125 +2,107 @@ package com.mycompany.webapp.service;
 
 import org.springframework.stereotype.Service;
 
-/**
- * 通知サービス デプロイ結果やシステム状態をLINEで通知
- */
+/** 通知サービス デプロイ結果やシステム状態をLINEで通知 */
 @Service
 public class NotificationService {
 
-    /**
-     * デプロイ成功通知をLINEで送信
-     */
-    public void sendDeploySuccessNotification(String serviceName, String commitId,
-            String deployTime) {
-        String message = createSuccessFlexMessage(serviceName, commitId, deployTime);
-        sendLineMessage(message);
+  /** デプロイ成功通知をLINEで送信 */
+  public void sendDeploySuccessNotification(
+      String serviceName, String commitId, String deployTime) {
+    String message = createSuccessFlexMessage(serviceName, commitId, deployTime);
+    sendLineMessage(message);
+  }
+
+  /** デプロイ失敗通知をLINEで送信 */
+  public void sendDeployFailureNotification(
+      String serviceName, String commitId, String errorMessage, String deployTime) {
+    String message = createFailureFlexMessage(serviceName, commitId, errorMessage, deployTime);
+    sendLineMessage(message);
+  }
+
+  /** デプロイ失敗通知をLINEで送信（詳細ログ付き） */
+  public void sendDeployFailureNotificationWithLog(
+      String serviceName, String commitId, String errorLog, String deployTime) {
+    String analyzedError = analyzeDeploymentError(errorLog);
+    String message =
+        createFailureFlexMessageWithAnalysis(
+            serviceName, commitId, analyzedError, errorLog, deployTime);
+    sendLineMessage(message);
+  }
+
+  /** デプロイ開始通知をLINEで送信 */
+  public void sendDeployStartNotification(String serviceName, String commitId, String deployTime) {
+    String message = createStartFlexMessage(serviceName, commitId, deployTime);
+    sendLineMessage(message);
+  }
+
+  /** アプリケーション起動完了通知をLINEで送信 */
+  public void sendApplicationStartedNotification(
+      String timestamp, String environment, String port) {
+    String message = createApplicationStartedFlexMessage(timestamp, environment, port);
+    sendLineMessage(message);
+  }
+
+  /** LINE Bot MCPを使用してブロードキャストメッセージを送信 */
+  private void sendLineMessage(String flexMessage) {
+    try {
+      // MCP LINE Bot機能を使用してブロードキャストメッセージを送信
+      // この実装では、実際のMCP呼び出しは外部から行われることを想定
+      System.out.println("=== LINE ブロードキャストメッセージ送信 ===");
+      System.out.println("メッセージ内容: " + flexMessage);
+      System.out.println("============================================");
+
+      // 実際の送信処理は外部のMCPクライアントが実行
+      // ここではログ出力のみ行い、実際の送信は別途実装
+
+    } catch (Exception e) {
+      System.err.println("LINE通知準備エラー: " + e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
+  /** デプロイ失敗の詳細ログを解析してエラー要因を特定 */
+  private String analyzeDeploymentError(String errorLog) {
+    if (errorLog == null || errorLog.isEmpty()) {
+      return "不明なエラー";
     }
 
-    /**
-     * デプロイ失敗通知をLINEで送信
-     */
-    public void sendDeployFailureNotification(String serviceName, String commitId,
-            String errorMessage, String deployTime) {
-        String message = createFailureFlexMessage(serviceName, commitId, errorMessage, deployTime);
-        sendLineMessage(message);
+    // PostgreSQL接続エラーの検出
+    if (errorLog.contains("java.io.EOFException") && errorLog.contains("postgresql")) {
+      return "PostgreSQL SSL接続エラー (EOFException)";
     }
 
-    /**
-     * デプロイ失敗通知をLINEで送信（詳細ログ付き）
-     */
-    public void sendDeployFailureNotificationWithLog(String serviceName, String commitId,
-            String errorLog, String deployTime) {
-        String analyzedError = analyzeDeploymentError(errorLog);
-        String message = createFailureFlexMessageWithAnalysis(serviceName, commitId, analyzedError,
-                errorLog, deployTime);
-        sendLineMessage(message);
+    if (errorLog.contains("Connection refused")) {
+      return "データベース接続拒否";
     }
 
-    /**
-     * デプロイ開始通知をLINEで送信
-     */
-    public void sendDeployStartNotification(String serviceName, String commitId,
-            String deployTime) {
-        String message = createStartFlexMessage(serviceName, commitId, deployTime);
-        sendLineMessage(message);
+    if (errorLog.contains("UnknownHostException")) {
+      return "データベースホスト名解決エラー";
     }
 
-    /**
-     * アプリケーション起動完了通知をLINEで送信
-     */
-    public void sendApplicationStartedNotification(String timestamp, String environment,
-            String port) {
-        String message = createApplicationStartedFlexMessage(timestamp, environment, port);
-        sendLineMessage(message);
+    if (errorLog.contains("SocketTimeoutException")) {
+      return "データベース接続タイムアウト";
     }
 
-    /**
-     * LINE Bot MCPを使用してブロードキャストメッセージを送信
-     */
-    private void sendLineMessage(String flexMessage) {
-        try {
-            // MCP LINE Bot機能を使用してブロードキャストメッセージを送信
-            // この実装では、実際のMCP呼び出しは外部から行われることを想定
-            System.out.println("=== LINE ブロードキャストメッセージ送信 ===");
-            System.out.println("メッセージ内容: " + flexMessage);
-            System.out.println("============================================");
-
-            // 実際の送信処理は外部のMCPクライアントが実行
-            // ここではログ出力のみ行い、実際の送信は別途実装
-
-        } catch (Exception e) {
-            System.err.println("LINE通知準備エラー: " + e.getMessage());
-            e.printStackTrace();
-        }
+    if (errorLog.contains("BeanCreationException")) {
+      return "Spring Bean作成エラー";
     }
 
-    /**
-     * デプロイ失敗の詳細ログを解析してエラー要因を特定
-     */
-    private String analyzeDeploymentError(String errorLog) {
-        if (errorLog == null || errorLog.isEmpty()) {
-            return "不明なエラー";
-        }
-
-        // PostgreSQL接続エラーの検出
-        if (errorLog.contains("java.io.EOFException") && errorLog.contains("postgresql")) {
-            return "PostgreSQL SSL接続エラー (EOFException)";
-        }
-
-        if (errorLog.contains("Connection refused")) {
-            return "データベース接続拒否";
-        }
-
-        if (errorLog.contains("UnknownHostException")) {
-            return "データベースホスト名解決エラー";
-        }
-
-        if (errorLog.contains("SocketTimeoutException")) {
-            return "データベース接続タイムアウト";
-        }
-
-        if (errorLog.contains("BeanCreationException")) {
-            return "Spring Bean作成エラー";
-        }
-
-        if (errorLog.contains("DataSourceBeanCreationException")) {
-            return "データソース設定エラー";
-        }
-
-        if (errorLog.contains("sslmode")) {
-            return "SSL接続設定問題";
-        }
-
-        return "アプリケーション起動エラー";
+    if (errorLog.contains("DataSourceBeanCreationException")) {
+      return "データソース設定エラー";
     }
 
-    /**
-     * デプロイ成功用のFlexメッセージを作成
-     */
-    private String createSuccessFlexMessage(String serviceName, String commitId,
-            String deployTime) {
-        return String.format("""
+    if (errorLog.contains("sslmode")) {
+      return "SSL接続設定問題";
+    }
+
+    return "アプリケーション起動エラー";
+  }
+
+  /** デプロイ成功用のFlexメッセージを作成 */
+  private String createSuccessFlexMessage(String serviceName, String commitId, String deployTime) {
+    return String.format(
+        """
                 {
                   "altText": "✅ デプロイ成功 - %s",
                   "contents": {
@@ -223,15 +205,15 @@ public class NotificationService {
                     }
                   }
                 }
-                """, serviceName, serviceName, serviceName, commitId, deployTime);
-    }
+                """,
+        serviceName, serviceName, serviceName, commitId, deployTime);
+  }
 
-    /**
-     * デプロイ失敗用のFlexメッセージを作成
-     */
-    private String createFailureFlexMessage(String serviceName, String commitId,
-            String errorMessage, String deployTime) {
-        return String.format("""
+  /** デプロイ失敗用のFlexメッセージを作成 */
+  private String createFailureFlexMessage(
+      String serviceName, String commitId, String errorMessage, String deployTime) {
+    return String.format(
+        """
                 {
                   "altText": "❌ デプロイ失敗 - %s",
                   "contents": {
@@ -334,14 +316,14 @@ public class NotificationService {
                     }
                   }
                 }
-                """, serviceName, serviceName, serviceName, commitId, deployTime, errorMessage);
-    }
+                """,
+        serviceName, serviceName, serviceName, commitId, deployTime, errorMessage);
+  }
 
-    /**
-     * デプロイ開始用のFlexメッセージを作成
-     */
-    private String createStartFlexMessage(String serviceName, String commitId, String deployTime) {
-        return String.format("""
+  /** デプロイ開始用のFlexメッセージを作成 */
+  private String createStartFlexMessage(String serviceName, String commitId, String deployTime) {
+    return String.format(
+        """
                 {
                   "altText": "🚀 デプロイ開始 - %s",
                   "contents": {
@@ -425,15 +407,15 @@ public class NotificationService {
                     }
                   }
                 }
-                """, serviceName, serviceName, serviceName, commitId, deployTime);
-    }
+                """,
+        serviceName, serviceName, serviceName, commitId, deployTime);
+  }
 
-    /**
-     * アプリケーション起動完了用のFlexメッセージを作成
-     */
-    private String createApplicationStartedFlexMessage(String timestamp, String environment,
-            String port) {
-        return String.format("""
+  /** アプリケーション起動完了用のFlexメッセージを作成 */
+  private String createApplicationStartedFlexMessage(
+      String timestamp, String environment, String port) {
+    return String.format(
+        """
                 {
                   "altText": "🚀 アプリケーション起動完了",
                   "contents": {
@@ -521,18 +503,22 @@ public class NotificationService {
                       ]
                     }
                   }
-                }                """, timestamp, environment, port);
-    }
+                }                """,
+        timestamp, environment, port);
+  }
 
-    /**
-     * デプロイ失敗用のFlexメッセージを作成（詳細解析付き）
-     */
-    private String createFailureFlexMessageWithAnalysis(String serviceName, String commitId,
-            String analyzedError, String errorLog, String deployTime) {
-        // エラーログを最初の5行に制限
-        String truncatedLog = truncateErrorLog(errorLog, 5);
+  /** デプロイ失敗用のFlexメッセージを作成（詳細解析付き） */
+  private String createFailureFlexMessageWithAnalysis(
+      String serviceName,
+      String commitId,
+      String analyzedError,
+      String errorLog,
+      String deployTime) {
+    // エラーログを最初の5行に制限
+    String truncatedLog = truncateErrorLog(errorLog, 5);
 
-        return String.format("""
+    return String.format(
+        """
                 {
                   "altText": "❌ デプロイ失敗 - %s",
                   "contents": {
@@ -673,58 +659,59 @@ public class NotificationService {
                     }
                   }
                 }
-                """, serviceName, serviceName, analyzedError, serviceName, commitId, deployTime,
-                truncatedLog);
+                """,
+        serviceName, serviceName, analyzedError, serviceName, commitId, deployTime, truncatedLog);
+  }
+
+  /** エラーログを指定された行数に制限 */
+  private String truncateErrorLog(String errorLog, int maxLines) {
+    if (errorLog == null || errorLog.isEmpty()) {
+      return "ログが取得できませんでした";
     }
 
-    /**
-     * エラーログを指定された行数に制限
-     */
-    private String truncateErrorLog(String errorLog, int maxLines) {
-        if (errorLog == null || errorLog.isEmpty()) {
-            return "ログが取得できませんでした";
-        }
-
-        String[] lines = errorLog.split("\n");
-        if (lines.length <= maxLines) {
-            return errorLog;
-        }
-
-        StringBuilder truncated = new StringBuilder();
-        for (int i = 0; i < maxLines; i++) {
-            truncated.append(lines[i]).append("\n");
-        }
-        truncated.append("... (以下 ").append(lines.length - maxLines).append(" 行省略)");
-
-        return truncated.toString();
+    String[] lines = errorLog.split("\n");
+    if (lines.length <= maxLines) {
+      return errorLog;
     }
 
-    /**
-     * 詳細な接続エラー情報をLINEに送信
-     */
-    public void sendConnectionErrorDetails(String errorType, String errorMessage,
-            String diagnostic) {
-        try {
-            String message =
-                    "🚨 DB接続エラー詳細\\n" + "時刻: "
-                            + java.time.LocalDateTime.now()
-                                    .format(java.time.format.DateTimeFormatter
-                                            .ofPattern("yyyy/MM/dd HH:mm:ss"))
-                            + "\\n" + "エラータイプ: " + (errorType != null ? errorType : "不明") + "\\n"
-                            + "メッセージ: "
-                            + (errorMessage != null ? errorMessage.substring(0,
-                                    Math.min(errorMessage.length(), 100)) : "詳細なし")
-                            + "\\n" + "診断情報: "
-                            + (diagnostic != null
-                                    ? diagnostic.substring(0, Math.min(diagnostic.length(), 100))
-                                    : "診断情報なし")
-                            + "\\n" + "💡対処: Renderダッシュボードで環境変数・DBサービス状態を確認";
-
-            sendLineMessage(message);
-            System.out.println("📱 詳細接続エラー情報をLINEに送信しました");
-
-        } catch (Exception e) {
-            System.err.println("❌ LINE通知送信エラー: " + e.getMessage());
-        }
+    StringBuilder truncated = new StringBuilder();
+    for (int i = 0; i < maxLines; i++) {
+      truncated.append(lines[i]).append("\n");
     }
+    truncated.append("... (以下 ").append(lines.length - maxLines).append(" 行省略)");
+
+    return truncated.toString();
+  }
+
+  /** 詳細な接続エラー情報をLINEに送信 */
+  public void sendConnectionErrorDetails(String errorType, String errorMessage, String diagnostic) {
+    try {
+      String message =
+          "🚨 DB接続エラー詳細\\n"
+              + "時刻: "
+              + java.time.LocalDateTime.now()
+                  .format(java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
+              + "\\n"
+              + "エラータイプ: "
+              + (errorType != null ? errorType : "不明")
+              + "\\n"
+              + "メッセージ: "
+              + (errorMessage != null
+                  ? errorMessage.substring(0, Math.min(errorMessage.length(), 100))
+                  : "詳細なし")
+              + "\\n"
+              + "診断情報: "
+              + (diagnostic != null
+                  ? diagnostic.substring(0, Math.min(diagnostic.length(), 100))
+                  : "診断情報なし")
+              + "\\n"
+              + "💡対処: Renderダッシュボードで環境変数・DBサービス状態を確認";
+
+      sendLineMessage(message);
+      System.out.println("📱 詳細接続エラー情報をLINEに送信しました");
+
+    } catch (Exception e) {
+      System.err.println("❌ LINE通知送信エラー: " + e.getMessage());
+    }
+  }
 }

@@ -8,11 +8,9 @@ public class WebappApplication {
   public static void main(String[] args) {
     // 緊急対応: 環境変数とシステム情報を詳細出力
     System.out.println("=== 家計簿アプリケーション起動 ===");
-    System.out.println("環境変数詳細:");
-
-    // DATABASE_URLの詳細分析
+    System.out.println("環境変数詳細:"); // DATABASE_URLの詳細分析
     String databaseUrl = System.getenv("DATABASE_URL");
-    System.out.println("  DATABASE_URL: " + databaseUrl);
+    System.out.println("  DATABASE_URL: " + (databaseUrl != null ? "設定済み" : "未設定"));
     if (databaseUrl != null) {
       if (databaseUrl.contains("sslmode")) {
         System.out.println("    SSL設定検出: " + databaseUrl.substring(databaseUrl.indexOf("sslmode")));

@@ -1,20 +1,12 @@
-# Build directories
-target/
+# Prettierで除外するファイル
 node_modules/
-dist/
-build/
-
-# IDE files
-.vscode/
-.idea/
-*.iml
-
-# Log files
+target/
+.git/
+*.jar
+*.class
 *.log
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Documentation
+pom.xml
 *.md
+README.md
+HELP.md
+COMPLETE_SPECIFICATION.md

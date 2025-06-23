@@ -89,9 +89,9 @@ http://localhost:8080
 
 #### 環境変数設定
 ```bash
-DATABASE_URL=postgresql://username:password@host:5432/database
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
+DATABASE_URL=postgresql://[username]:[password]@[host]:5432/[database]
+DB_USERNAME=[username]
+DB_PASSWORD=[password]
 PORT=8080
 RENDER_SERVICE_NAME=kakeibo-app
 SPRING_PROFILES_ACTIVE=production

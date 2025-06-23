@@ -31,7 +31,7 @@ main {
 }
 
 select,
-input[type="month"] {
+input[type='month'] {
   padding: 10px;
   font-size: 16px;
   border-radius: 4px;
@@ -183,16 +183,16 @@ Th {
 }
 
 /* 左寄せ・右寄せのカラムの固定 */
-Th[fixed="left"],
-Td[fixed="left"] {
+Th[fixed='left'],
+Td[fixed='left'] {
   position: sticky;
   left: 0;
   background-color: #fff; /* 固定された列の背景色 */
   z-index: 1;
 }
 
-Th[fixed="right"],
-Td[fixed="right"] {
+Th[fixed='right'],
+Td[fixed='right'] {
   position: sticky;
   right: 0;
   background-color: #fff; /* 固定された列の背景色 */
@@ -216,13 +216,13 @@ Button:hover {
 }
 
 /* ボタンの小さめスタイル */
-Button[size="s"] {
+Button[size='s'] {
   padding: 4px 8px;
   font-size: 12px;
 }
 
 /* 操作ボタンセルの整列 */
-Td[fixed="right"] {
+Td[fixed='right'] {
   text-align: center; /* 操作ボタンは中央寄せ */
 }
 
