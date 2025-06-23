@@ -1,10 +1,14 @@
 package com.mycompany.webapp.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /** 通知サービス デプロイ結果やシステム状態をLINEで通知 */
 @Service
 public class NotificationService {
+
+  @Autowired 
+  private MCPLineBotService mcpLineBotService;
 
   /** デプロイ成功通知をLINEで送信 */
   public void sendDeploySuccessNotification(
@@ -41,22 +45,35 @@ public class NotificationService {
       String timestamp, String environment, String port) {
     String message = createApplicationStartedFlexMessage(timestamp, environment, port);
     sendLineMessage(message);
-  }
-
-  /** LINE Bot MCPを使用してブロードキャストメッセージを送信 */
+  }  /** LINE Bot MCPを使用してブロードキャストメッセージを送信 */
   private void sendLineMessage(String flexMessage) {
     try {
+      String channelAccessToken = System.getenv("LINE_CHANNEL_ACCESS_TOKEN");
+      
+      if (channelAccessToken == null || channelAccessToken.isEmpty()) {
+        System.out.println("=== LINE通知設定未完了 ===");
+        System.out.println("環境変数 LINE_CHANNEL_ACCESS_TOKEN が未設定です");
+        System.out.println("メッセージ内容（ログのみ）: " + flexMessage);
+        System.out.println("========================");
+        return;
+      }
+      
       // MCP LINE Bot機能を使用してブロードキャストメッセージを送信
-      // この実装では、実際のMCP呼び出しは外部から行われることを想定
-      System.out.println("=== LINE ブロードキャストメッセージ送信 ===");
-      System.out.println("メッセージ内容: " + flexMessage);
-      System.out.println("============================================");
-
-      // 実際の送信処理は外部のMCPクライアントが実行
-      // ここではログ出力のみ行い、実際の送信は別途実装
+      System.out.println("=== LINE ブロードキャスト送信開始 ===");
+      System.out.println("Channel Access Token: " + channelAccessToken.substring(0, 10) + "...");
+      
+      // MCPLineBotServiceを使用して実際にLINE送信
+      boolean result = mcpLineBotService.sendBroadcastFlexMessage("家計簿アプリ通知", flexMessage);
+      
+      if (result) {
+        System.out.println("LINE送信成功");
+      } else {
+        System.out.println("LINE送信失敗");
+      }
+      System.out.println("===================================");
 
     } catch (Exception e) {
-      System.err.println("LINE通知準備エラー: " + e.getMessage());
+      System.err.println("LINE通知送信エラー: " + e.getMessage());
       e.printStackTrace();
     }
   }
