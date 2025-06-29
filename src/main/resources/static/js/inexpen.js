@@ -174,22 +174,22 @@ document.getElementById('expenseForm').addEventListener('submit', async function
     const category = categorySelect.options[categorySelect.selectedIndex].text; // カテゴリ
     const amount = document.getElementById('amount').value; // 金額
 
-    // 編集モードの判定（tryブロックの外で定義）
+    // 編集モードの判定
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     const isEditMode = id !== null;
     // 収支登録またはAPIにリクエストを送信
     try {
-      // リクエストペイロードを作成（新しいテーブル構造に対応）
+      // リクエストペイロードを作成
       const payload = {
-        hiduke: date, // registeredAt → hiduke
-        syubetu: incomeOrExpenditure === 'income' ? '収入' : '支出', // type → syubetu (日本語)
-        naisyo: category, // category → naisyo
-        kingaku: parseInt(amount, 10), // amount → kingaku
+        hiduke: date,
+        syubetu: incomeOrExpenditure === 'income' ? '収入' : '支出',
+        naisyo: category,
+        kingaku: parseInt(amount, 10),
       };
       console.log('送信するデータ:', payload); // 送信するデータをログに出力
 
-      // ローカルストレージからユーザーIDを取得（userTokenからuserIdに変更）
+      // ローカルストレージからユーザーIDを取得
       let userId = localStorage.getItem('userId');
       if (!userId) {
         userId = 'anonymous_user_' + Date.now();
@@ -203,7 +203,7 @@ document.getElementById('expenseForm').addEventListener('submit', async function
         method: method,
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Id': userId, // X-User-Token → X-User-Id
+          'X-User-Id': userId,
         },
         body: JSON.stringify(payload),
       });
