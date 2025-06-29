@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
       // 期間タイプを取得
       const periodType = document.getElementById('period').value;
-      let startDate, endDate;
+      let startDate, endDate, selectedMonth, selectedYear;
 
       if (periodType === 'monthly') {
         // 月間の場合: 年月から期間を計算
-        const selectedMonth = document.getElementById('startmonth').value; // YYYY-MM形式
+        selectedMonth = document.getElementById('startmonth').value; // YYYY-MM形式
         if (!selectedMonth) {
           alert('年月を選択してください。');
           return;
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       } else if (periodType === 'yearly') {
         // 年間の場合: 年から期間を計算
-        const selectedYear = document.getElementById('startyear').value;
+        selectedYear = document.getElementById('startyear').value;
         if (!selectedYear) {
           alert('年を選択してください。');
           return;
@@ -65,13 +65,23 @@ document.addEventListener('DOMContentLoaded', function () {
       });
 
       // レポートデータを取得（期間指定付き）
+      console.log('リクエストURL:', `/api/infokanri/report?${params.toString()}`);
       const response = await fetch(`/api/infokanri/report?${params.toString()}`);
 
+      console.log('レスポンス詳細:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
+
       if (!response.ok) {
-        throw new Error(`レポートデータ取得に失敗しました。ステータス: ${response.status}`);
+        const errorText = await response.text();
+        console.error('APIエラー詳細:', errorText);
+        throw new Error(`レポートデータ取得に失敗しました。ステータス: ${response.status}, エラー: ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('取得データ:', data);
 
       // 指定期間内のデータのみフィルタリング
       const filteredData = data.filter((item) => {
@@ -114,7 +124,19 @@ document.addEventListener('DOMContentLoaded', function () {
       tbody.innerHTML = '';
 
       if (filteredData.length === 0) {
-        const periodText = periodType === 'monthly' ? `${selectedMonth}` : `${document.getElementById('startyear').value}年`;
+        let periodText = '';
+        if (periodType === 'monthly') {
+          const month = document.getElementById('startmonth').value;
+          if (month) {
+            const [year, monthNum] = month.split('-');
+            periodText = `${year}年${monthNum}月`;
+          } else {
+            periodText = '指定月';
+          }
+        } else {
+          const year = document.getElementById('startyear').value;
+          periodText = year ? `${year}年` : '指定年';
+        }
         tbody.innerHTML = `<tr><td colspan="4">${periodText}のデータがありません</td></tr>`;
         return;
       }
