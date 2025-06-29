@@ -14,6 +14,13 @@ async function loadDataList() {
 
     const data = await response.json();
 
+    // 登録年月日の昇順（古い順）でソート
+    data.sort((a, b) => {
+      const dateA = new Date(a.hiduke);
+      const dateB = new Date(b.hiduke);
+      return dateA - dateB;
+    });
+
     const tbody = document.querySelector('tbody');
     tbody.innerHTML = ''; // 既存のデータをクリア
 
@@ -25,14 +32,13 @@ async function loadDataList() {
       const row = document.createElement('tr');
       row.dataset.id = item.id;
 
-      // 新しいテーブル構造に対応
-      const typeText = item.syubetu; // 既に日本語で格納されている
-      const amountText = item.kingaku.toLocaleString() + '円'; // amount → kingaku
+      const typeText = item.syubetu;
+      const amountText = item.kingaku.toLocaleString() + '円';
 
       row.innerHTML = `
-        <td class="date-cell">${item.hiduke}</td>         
+        <td class="date-cell">${item.hiduke}</td>
         <td class="type-cell">${typeText}</td>
-        <td class="category-cell">${item.naisyo}</td>      
+        <td class="category-cell">${item.naisyo}</td>
         <td class="amount-cell">${amountText}</td>
         <td>
           <div class="button-wrapper">

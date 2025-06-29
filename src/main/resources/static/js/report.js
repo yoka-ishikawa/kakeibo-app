@@ -25,8 +25,47 @@ document.addEventListener('DOMContentLoaded', function () {
   const reportButton = document.getElementById('displayButton');
   reportButton.addEventListener('click', async function () {
     try {
-      // レポートデータを取得
-      const response = await fetch('/api/infokanri/report');
+      // 期間タイプを取得
+      const periodType = document.getElementById('period').value;
+      let startDate, endDate;
+
+      if (periodType === 'monthly') {
+        // 月間の場合: 年月から期間を計算
+        const selectedMonth = document.getElementById('startmonth').value; // YYYY-MM形式
+        if (!selectedMonth) {
+          alert('年月を選択してください。');
+          return;
+        }
+
+        const [year, month] = selectedMonth.split('-');
+        startDate = `${year}-${month}-01`;
+
+        // 月末日を計算
+        const nextMonth = new Date(parseInt(year), parseInt(month), 0);
+        const lastDay = nextMonth.getDate();
+        endDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+
+      } else if (periodType === 'yearly') {
+        // 年間の場合: 年から期間を計算
+        const selectedYear = document.getElementById('startyear').value;
+        if (!selectedYear) {
+          alert('年を選択してください。');
+          return;
+        }
+
+        startDate = `${selectedYear}-01-01`;
+        endDate = `${selectedYear}-12-31`;
+      }
+
+      // クエリパラメータを構築
+      const params = new URLSearchParams({
+        period: periodType,
+        startDate: startDate,
+        endDate: endDate
+      });
+
+      // レポートデータを取得（期間指定付き）
+      const response = await fetch(`/api/infokanri/report?${params.toString()}`);
 
       if (!response.ok) {
         throw new Error(`レポートデータ取得に失敗しました。ステータス: ${response.status}`);
@@ -34,19 +73,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const data = await response.json();
 
+      // 指定期間内のデータのみフィルタリング
+      const filteredData = data.filter((item) => {
+        const itemDate = item.hiduke; // YYYY-MM-DD形式
+        return itemDate >= startDate && itemDate <= endDate;
+      });
+
+      // 登録年月日の昇順でソート（古い順）
+      filteredData.sort((a, b) => {
+        const dateA = new Date(a.hiduke);
+        const dateB = new Date(b.hiduke);
+        return dateA - dateB;
+      });
+
       // レポートエリアを表示
       document.getElementById('report-area').style.display = 'block';
 
-      // 収支を計算
+      // 収支を計算（フィルタリング済みデータで計算）
       let totalIncome = 0;
       let totalExpenditure = 0;
-      data.forEach((item) => {
+      filteredData.forEach((item) => {
         if (item.syubetu === '収入') {
-          // type → syubetu, "income" → "収入"
-          totalIncome += item.kingaku; // amount → kingaku
+          totalIncome += item.kingaku;
         } else if (item.syubetu === '支出') {
-          // type → syubetu, "expenditure" → "支出"
-          totalExpenditure += item.kingaku; // amount → kingaku
+          totalExpenditure += item.kingaku;
         }
       });
 
@@ -63,14 +113,16 @@ document.addEventListener('DOMContentLoaded', function () {
       const tbody = document.querySelector('tbody');
       tbody.innerHTML = '';
 
-      if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4">データがありません</td></tr>';
+      if (filteredData.length === 0) {
+        const periodText = periodType === 'monthly' ? `${selectedMonth}` : `${document.getElementById('startyear').value}年`;
+        tbody.innerHTML = `<tr><td colspan="4">${periodText}のデータがありません</td></tr>`;
         return;
       }
-      data.forEach((item) => {
+
+      filteredData.forEach((item) => {
         const row = document.createElement('tr');
-        const typeText = item.syubetu; // 修正: item.type → item.syubetu
-        const amountText = item.kingaku.toLocaleString() + '円'; // 修正: item.amount → item.kingaku
+        const typeText = item.syubetu;
+        const amountText = item.kingaku.toLocaleString() + '円';
 
         row.innerHTML = `
           <td>${item.hiduke}</td>
@@ -81,6 +133,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         tbody.appendChild(row);
       });
+
+      console.log(`レポート表示完了: ${periodType}期間, ${filteredData.length}件のデータ`);
+
     } catch (error) {
       console.error('レポートデータ取得エラー:', error);
       alert('レポートデータの取得に失敗しました。');
