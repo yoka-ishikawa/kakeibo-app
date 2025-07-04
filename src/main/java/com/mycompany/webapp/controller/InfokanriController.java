@@ -28,8 +28,7 @@ public class InfokanriController {
    * @return 登録された収支データ（IDを含む）
    */
   @PostMapping(produces = "application/json")
-  public ResponseEntity<String> add(
-      @RequestBody Infokanri infokanri,
+  public ResponseEntity<String> add(@RequestBody Infokanri infokanri,
       @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
     System.out.println("=== 収支データ登録開始 ===");
     System.out.println("User ID: " + userId);
@@ -54,13 +53,8 @@ public class InfokanriController {
 
         } catch (Exception dbException) {
           retryCount++;
-          System.err.println(
-              "データベース接続エラー (試行 "
-                  + retryCount
-                  + "/"
-                  + maxRetries
-                  + "): "
-                  + dbException.getMessage());
+          System.err.println("データベース接続エラー (試行 " + retryCount + "/" + maxRetries + "): "
+              + dbException.getMessage());
 
           if (retryCount >= maxRetries) {
             throw dbException; // 最大試行回数に達した場合、例外を再スロー
@@ -77,15 +71,10 @@ public class InfokanriController {
       }
 
       // 一時的にシンプルなJSONレスポンスを返す
-      String jsonResponse =
-          String.format(
-              "{\"id\": %d, \"userId\": \"%s\", \"syubetu\": \"%s\", \"kingaku\": %d, \"naisyo\": \"%s\", \"hiduke\": \"%s\"}",
-              savedData.getId(),
-              savedData.getUserId(),
-              savedData.getSyubetu(),
-              savedData.getKingaku(),
-              savedData.getNaisyo(),
-              savedData.getHiduke().toString());
+      String jsonResponse = String.format(
+          "{\"id\": %d, \"userId\": \"%s\", \"syubetu\": \"%s\", \"kingaku\": %d, \"naisyo\": \"%s\", \"hiduke\": \"%s\"}",
+          savedData.getId(), savedData.getUserId(), savedData.getSyubetu(), savedData.getKingaku(),
+          savedData.getNaisyo(), savedData.getHiduke().toString());
 
       System.out.println("手動JSON生成完了: " + jsonResponse);
 
@@ -103,8 +92,7 @@ public class InfokanriController {
       }
 
       // エラー時のレスポンス
-      return ResponseEntity.internalServerError()
-          .header("Content-Type", "application/json")
+      return ResponseEntity.internalServerError().header("Content-Type", "application/json")
           .body("{\"error\": \"" + errorMessage + "\", \"details\": \"" + e.getMessage() + "\"}");
     }
   }
@@ -144,8 +132,7 @@ public class InfokanriController {
    * @return 更新された収支データ
    */
   @PutMapping(value = "/{id}", produces = "application/json")
-  public ResponseEntity<Infokanri> updateData(
-      @PathVariable Long id,
+  public ResponseEntity<Infokanri> updateData(@PathVariable Long id,
       @RequestBody Infokanri infokanri,
       @RequestHeader(value = "X-User-Id", defaultValue = "anonymous") String userId) {
     System.out.println("=== 収支データ更新 ===");
@@ -162,7 +149,7 @@ public class InfokanriController {
   }
 
   /**
-   * レポート画面用のデータを取得 現在は全データを返すが、将来的には期間フィルタリング機能を実装予定
+   * レポート画面用のデータを取得
    *
    * @param period 期間指定（月間/年間）
    * @param startDate 開始日
@@ -170,8 +157,7 @@ public class InfokanriController {
    * @return フィルタリングされた収支データのリスト
    */
   @GetMapping("/report")
-  public List<Infokanri> getReportData(
-      @RequestParam(required = false) String period,
+  public List<Infokanri> getReportData(@RequestParam(required = false) String period,
       @RequestParam(required = false) String startDate,
       @RequestParam(required = false) String endDate) {
     return service.getReportData(period, startDate, endDate);
