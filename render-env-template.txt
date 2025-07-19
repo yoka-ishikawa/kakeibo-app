@@ -1,0 +1,35 @@
+# Render環境変数設定テンプレート
+# コピー&ペースト用（実際の値に置換してください）
+
+# ===========================================
+# Supabase移行用環境変数
+# ===========================================
+
+# プロファイル設定（必須）
+SPRING_PROFILES_ACTIVE=production-supabase
+
+# データベース接続情報（必須 - 実際の値に置換）
+DATABASE_URL=postgresql://postgres:[YOUR_SUPABASE_PASSWORD]@db.[YOUR_PROJECT_REF].supabase.co:5432/postgres
+DB_USERNAME=postgres
+DB_PASSWORD=[YOUR_SUPABASE_PASSWORD]
+
+# Java実行時オプション（既存）
+JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=50.0
+
+# ===========================================
+# 置換必要項目
+# ===========================================
+# [YOUR_SUPABASE_PASSWORD] → Supabaseプロジェクト作成時に設定したパスワード
+# [YOUR_PROJECT_REF] → SupabaseプロジェクトのReference ID (例: abc123def456)
+
+# ===========================================
+# 確認方法
+# ===========================================
+# Project Reference IDの確認:
+# 1. Supabase Dashboard → Settings → General
+# 2. "Reference ID" をコピー
+# 3. または接続文字列から "db.XXXXX.supabase.co" のXXXXX部分
+
+# パスワード確認:  
+# 1. Supabaseプロジェクト作成時に設定
+# 2. 忘れた場合: Settings → Database → "Reset database password"

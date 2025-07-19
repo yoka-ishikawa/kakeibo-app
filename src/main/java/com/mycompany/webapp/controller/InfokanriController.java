@@ -72,9 +72,9 @@ public class InfokanriController {
 
       // 一時的にシンプルなJSONレスポンスを返す
       String jsonResponse = String.format(
-          "{\"id\": %d, \"userId\": \"%s\", \"syubetu\": \"%s\", \"kingaku\": %d, \"naisyo\": \"%s\", \"hiduke\": \"%s\"}",
-          savedData.getId(), savedData.getUserId(), savedData.getSyubetu(), savedData.getKingaku(),
-          savedData.getNaisyo(), savedData.getHiduke().toString());
+          "{\"id\": %d, \"userId\": \"%s\", \"type\": \"%s\", \"amount\": %d, \"category\": \"%s\", \"registedAt\": \"%s\"}",
+          savedData.getId(), savedData.getUserId(), savedData.getType(), savedData.getAmount(),
+          savedData.getCategory(), savedData.getRegistedAt().toString());
 
       System.out.println("手動JSON生成完了: " + jsonResponse);
 

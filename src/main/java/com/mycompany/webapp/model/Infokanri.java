@@ -24,18 +24,18 @@ public class Infokanri {
   @Column(name = "user_id")
   private String userId;
 
-  @Column(name = "syubetu", nullable = false, length = 50)
-  private String syubetu;
+  @Column(name = "type", nullable = false, length = 50)
+  private String type;
 
-  @Column(name = "kingaku", nullable = false)
-  private Integer kingaku;
+  @Column(name = "amount", nullable = false)
+  private Integer amount;
 
-  @Column(name = "naisyo")
-  private String naisyo;
+  @Column(name = "category")
+  private String category;
 
-  @Column(name = "hiduke", nullable = false)
+  @Column(name = "registed_at", nullable = false)
   @JsonFormat(pattern = "yyyy-MM-dd")
-  private LocalDate hiduke;
+  private LocalDate registedAt;
 
   @Column(name = "created_at")
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -62,13 +62,13 @@ public class Infokanri {
   public Infokanri() {}
 
   // 引数付きコンストラクタ
-  public Infokanri(
-      String userId, String syubetu, Integer kingaku, String naisyo, LocalDate hiduke) {
+  public Infokanri(String userId, String type, Integer amount, String category,
+      LocalDate registedAt) {
     this.userId = userId;
-    this.syubetu = syubetu;
-    this.kingaku = kingaku;
-    this.naisyo = naisyo;
-    this.hiduke = hiduke;
+    this.type = type;
+    this.amount = amount;
+    this.category = category;
+    this.registedAt = registedAt;
   }
 
   // Getter/Setter
@@ -88,36 +88,36 @@ public class Infokanri {
     this.userId = userId;
   }
 
-  public String getSyubetu() {
-    return syubetu;
+  public String getType() {
+    return type;
   }
 
-  public void setSyubetu(String syubetu) {
-    this.syubetu = syubetu;
+  public void setType(String type) {
+    this.type = type;
   }
 
-  public Integer getKingaku() {
-    return kingaku;
+  public Integer getAmount() {
+    return amount;
   }
 
-  public void setKingaku(Integer kingaku) {
-    this.kingaku = kingaku;
+  public void setAmount(Integer amount) {
+    this.amount = amount;
   }
 
-  public String getNaisyo() {
-    return naisyo;
+  public String getCategory() {
+    return category;
   }
 
-  public void setNaisyo(String naisyo) {
-    this.naisyo = naisyo;
+  public void setCategory(String category) {
+    this.category = category;
   }
 
-  public LocalDate getHiduke() {
-    return hiduke;
+  public LocalDate getRegistedAt() {
+    return registedAt;
   }
 
-  public void setHiduke(LocalDate hiduke) {
-    this.hiduke = hiduke;
+  public void setRegistedAt(LocalDate registedAt) {
+    this.registedAt = registedAt;
   }
 
   public LocalDateTime getCreatedAt() {
@@ -138,26 +138,8 @@ public class Infokanri {
 
   @Override
   public String toString() {
-    return "Infokanri{"
-        + "id="
-        + id
-        + ", userId='"
-        + userId
-        + '\''
-        + ", syubetu='"
-        + syubetu
-        + '\''
-        + ", kingaku="
-        + kingaku
-        + ", naisyo='"
-        + naisyo
-        + '\''
-        + ", hiduke="
-        + hiduke
-        + ", createdAt="
-        + createdAt
-        + ", updatedAt="
-        + updatedAt
-        + '}';
+    return "Infokanri{" + "id=" + id + ", userId='" + userId + '\'' + ", type='" + type + '\''
+        + ", amount=" + amount + ", category='" + category + '\'' + ", registedAt=" + registedAt
+        + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
   }
 }

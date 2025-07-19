@@ -1,0 +1,65 @@
+テストクラス,テストメソッド,テスト内容,期待結果,優先度,実装状況,備考
+InfokanriTest,testConstructorWithAllParameters,"全パラメータ（id=1L, userId=""test-user"", syubetu=""収入"", kingaku=50000, naisyo=""給与"", hiduke=LocalDate.now(), createdAt=now, updatedAt=now）でInfokanriインスタンス作成","全フィールドが正しく設定されたインスタンスが生成される。nullフィールドなし。toString()で全項目表示確認",高,未実装,POJOの基本機能確認
+InfokanriTest,testConstructorDefault,引数なしのデフォルトコンストラクタでInfokanriインスタンス作成,"インスタンス生成成功。全フィールドがnullまたはデフォルト値。NotNull制約のないフィールドのみnull許可",高,未実装,
+InfokanriTest,testSettersAndGetters,"各フィールド（id, userId, syubetu, kingaku, naisyo, hiduke, createdAt, updatedAt）のsetter呼び出し後、getterで値取得確認","設定した値がgetterで正確に取得できる。型変換エラーなし。LocalDate、LocalDateTimeの精度保持確認",高,未実装,全フィールドの動作確認
+InfokanriTest,testPrePersistLifecycle,"新規Infokanriオブジェクト作成後、onCreate()メソッド手動呼び出し（@PrePersist動作模擬）","createdAtとupdatedAtが現在時刻（±1秒以内）に自動設定される。nullから非nullに変更確認",高,未実装,JPAライフサイクル確認
+InfokanriTest,testPreUpdateLifecycle,"既存Infokanriオブジェクトのフィールド変更後、onUpdate()メソッド手動呼び出し（@PreUpdate動作模擬）","updatedAtのみが現在時刻に更新される。createdAtは変更されない。更新前後の時刻差確認",高,未実装,JPAライフサイクル確認
+InfokanriTest,testValidSyubetuValues,"syubetuフィールドに有効値「収入」「支出」を設定し、無効値「その他」「」（空文字）「null」での動作確認","有効値は正常設定。無効値は適切なバリデーション（将来実装時）またはそのまま保存される現在の動作確認",中,未実装,
+InfokanriTest,testInvalidKingakuNegative,"kingakuフィールドに負の値（-1000、-50000）を設定した場合の動作確認","現在はそのまま保存される。将来のバリデーション実装時は適切なエラー発生確認",中,未実装,
+InfokanriTest,testInvalidKingakuZero,"kingakuフィールドにゼロ値（0）を設定した場合の動作確認","ゼロ値が正常に保存される。家計簿としては有効なケース（無料商品等）",低,未実装,
+InfokanriTest,testHidukeFuture,"hidukeフィールドに未来の日付（LocalDate.now().plusDays(30)）を設定","未来日付が正常に保存される。家計簿の予定入力として有効なケース",低,未実装,
+InfokanriTest,testHidukePast,"hidukeフィールドに過去の日付（LocalDate.now().minusYears(1)）を設定","過去日付が正常に保存される。過去の家計簿データ入力として正常なケース",低,未実装,
+InfokanriTest,testToString,"toString()メソッド呼び出し、全フィールド値が含まれた文字列出力確認","「Infokanri{id=1, userId='test', syubetu='収入', kingaku=50000, naisyo='給与', hiduke=2025-07-19, ...}」形式での出力。null値も適切に表示",低,未実装,
+InfokanriTest,testEqualsAndHashCode,"同じ値を持つ2つのInfokanriインスタンス作成、equals()とhashCode()契約確認","等しいオブジェクトはequals()がtrue、hashCode()が同値。異なるオブジェクトは適切に区別される",中,未実装,
+InfokanriRepositoryTest,testSaveAndFindById,"テストデータ（syubetu='収入', kingaku=300000, naisyo='給与'等）をsave()で保存後、生成されたIDでfindById()実行","保存成功でIDが自動生成される（1以上）。findById()で同一データが取得できる。全フィールド値一致確認",高,未実装,JPA基本機能確認
+InfokanriRepositoryTest,testFindAll,"複数テストデータ（収入2件、支出3件）を事前保存後、findAll()で全データ取得","保存した全5件のデータが取得される。順序は主キー順（ID昇順）。データ内容の完全一致確認",高,未実装,
+InfokanriRepositoryTest,testFindAllEmpty,"データベースが空の状態でfindAll()実行","空のList<Infokanri>が返される。nullではなく空リスト。size()=0の確認",中,未実装,
+InfokanriRepositoryTest,testDeleteById,"事前保存データのIDを指定してdeleteById()実行後、findById()で存在確認","指定データが削除される。findById()でOptional.empty()が返される。他データは影響なし",高,未実装,
+InfokanriRepositoryTest,testDeleteByIdNotFound,"存在しないID（例：9999L）を指定してdeleteById()実行","例外が発生せず正常終了する。既存データに影響なし。JPA標準動作確認",中,未実装,
+InfokanriRepositoryTest,testExistsById,"存在するIDと存在しないIDでexistsById()を実行","存在するIDでtrue、存在しないIDでfalseが返される。boolean型の戻り値確認",中,未実装,
+InfokanriRepositoryTest,testCountRecords,"事前に7件のテストデータを保存後、count()メソッドでレコード数取得","count()が正確に7を返す。long型の戻り値確認。データ追加・削除後の数値変更も確認",低,未実装,
+InfokanriRepositoryTest,testSaveMultipleRecords,"異なる内容の3件のInfokanriデータをList.of()で作成し、saveAll()で一括保存","全3件が正常保存される。各レコードにIDが自動割り当て。findAll()で3件取得確認",中,未実装,
+InfokanriRepositoryTest,testUpdateRecord,"既存データのkingakuフィールドを変更してsave()実行（JPA更新処理）","該当レコードのkingakuが更新される。updatedAtタイムスタンプも更新。他フィールドは変更なし",高,未実装,
+InfokanriRepositoryTest,testFindByUserIdCustomQuery,"特定userId（'test-user-1'）でフィルタリングするカスタムクエリ実行（将来実装予定）","該当ユーザーのデータのみ取得される。他ユーザーデータは除外。List<Infokanri>で返却",低,未実装,将来機能
+InfokanriRepositoryTest,testDateRangeQuery,"指定期間（2025-01-01～2025-12-31）内のデータを取得するクエリ実行（将来実装予定）","期間内のデータのみ取得。範囲外データは除外。日付境界値の処理確認",低,未実装,将来機能
+InfokanriServiceTest,testSaveInfokanri,"正常なInfokanriオブジェクト作成後、saveInfokanri()メソッド呼び出し。Mockitoでrepository.save()の動作確認","repository.save()が1回呼び出される。引数のInfokanriオブジェクトが正しく渡される。戻り値のInfokanriが返される",高,未実装,ビジネスロジック中核
+InfokanriServiceTest,testSaveInfokanriWithNull,"null値をsaveInfokanri()に渡した場合の動作確認","NullPointerExceptionまたは適切な例外が発生する。repository.save()は呼び出されない",中,未実装,
+InfokanriServiceTest,testGetAllInfokanri,"getAllInfokanri()メソッド呼び出し。Mockitoでrepository.findAll()の戻り値を設定","repository.findAll()が1回呼び出される。Mockで設定したList<Infokanri>が正確に返される",高,未実装,
+InfokanriServiceTest,testGetAllInfokanriEmpty,"repository.findAll()が空リストを返すようMock設定後、getAllInfokanri()実行","空のList<Infokanri>が返される。nullではなく空リスト。例外発生なし",中,未実装,
+InfokanriServiceTest,testDeleteInfokanri,"有効なID（例：1L）を指定してdeleteInfokanri()実行","repository.existsById()でtrueを返すMock設定。repository.deleteById()が1回呼び出される",高,未実装,
+InfokanriServiceTest,testDeleteInfokanriNotFound,"存在しないID（repository.existsById()=false）でdeleteInfokanri()実行","repository.deleteById()は呼び出されない。例外発生せず正常終了",中,未実装,
+InfokanriServiceTest,testDeleteInfokanriWithNull,"null IDでdeleteInfokanri()実行","NullPointerException防止のため事前チェック。repository.existsById()、deleteById()ともに呼び出されない",中,未実装,
+InfokanriServiceTest,testUpdateInfokanri,"既存のInfokanri（ID設定済み）でupdateInfokanri()実行","repository.save()が1回呼び出される（JPAのsaveは更新処理）。更新後のInfokanriオブジェクト返却",高,未実装,
+InfokanriServiceTest,testUpdateInfokanriWithNull,"null値でupdateInfokanri()実行","nullが返される。repository.save()は呼び出されない。例外発生なし",中,未実装,
+InfokanriServiceTest,testUpdateInfokanriNotFound,"存在しないIDを持つInfokanriでupdateInfokanri()実行","repository.save()は呼び出される（JPAの仕様）。JPA側でエラー処理される可能性",中,未実装,
+InfokanriServiceTest,testGetReportData,"getReportData(""all"", """", """")でレポートデータ取得","現在の実装ではパラメータを無視してrepository.findAll()呼び出し。全データが返される",高,未実装,
+InfokanriServiceTest,testGetReportDataWithParameters,"getReportData(""monthly"", ""2025-07-01"", ""2025-07-31"")で期間指定レポート取得","現在はパラメータ無視でfindAll()実行。将来実装時は期間フィルタリング動作確認",中,未実装,
+InfokanriServiceTest,testGetReportDataDatabaseError,"repository.findAll()で例外発生をMock設定後、getReportData()実行","例外をキャッチして空のArrayList返却。アプリケーション継続性確保",高,未実装,エラーハンドリング重要
+InfokanriServiceTest,testTransactionalRollback,"@Transactionalアノテーション動作確認。saveInfokanri()内で例外発生させる","トランザクションがロールバックされる。データベースへの変更が取り消される",中,未実装,
+InfokanriControllerTest,testAddInfokanri,"正常なInfokanriJSONデータでPOST /api/infokanri実行。MockMvcでHTTPリクエスト送信","HTTPステータス200 OK。レスポンスヘッダーContent-Type: application/json。レスポンスボディに登録されたデータのJSON（ID含む）",高,未実装,REST API基本機能
+InfokanriControllerTest,testAddInfokanriWithUserId,"X-User-Idヘッダー付きでPOST /api/infokanri実行。ヘッダー値'test-user-123'を設定","ヘッダー値が正しくInfokanriオブジェクトのuserIdフィールドに設定される。レスポンスJSONでuserId確認",高,未実装,
+InfokanriControllerTest,testAddInfokanriInvalidData,"不正なJSONデータ（必須フィールドなし、型不一致等）でPOST実行","HTTPステータス400 Bad Request。エラーメッセージを含むJSONレスポンス。バリデーション詳細情報",中,未実装,
+InfokanriControllerTest,testAddInfokanriDatabaseError,"ServiceレイヤーでDataAccessException発生をMock設定後、POST実行","HTTPステータス500 Internal Server Error。エラーメッセージ「データベース接続に失敗しました」を含むJSON",高,未実装,エラーハンドリング
+InfokanriControllerTest,testAddInfokanriRetryLogic,"Service.saveInfokanri()で2回失敗後3回目で成功するMock設定。POST実行","再試行ロジックが動作。最大3回試行後に成功レスポンス。ログに再試行メッセージ出力確認",中,未実装,現在実装済み機能
+InfokanriControllerTest,testGetAllInfokanri,"GET /api/infokanri実行。Serviceから複数データ返却をMock設定","HTTPステータス200 OK。JSONの配列形式でデータ返却。各要素が完全なInfokanriオブジェクト構造",高,未実装,
+InfokanriControllerTest,testGetAllInfokanriEmpty,"GET /api/infokanri実行。Serviceから空リスト返却をMock設定","HTTPステータス200 OK。空のJSON配列[]返却。nullではなく有効なJSONレスポンス",中,未実装,
+InfokanriControllerTest,testDeleteInfokanri,"DELETE /api/infokanri/{id}実行（例：id=1）。Service.deleteInfokanri()成功をMock設定","HTTPステータス200 OK。削除成功メッセージのJSONレスポンス。{""message"":""削除しました""}形式",高,未実装,
+InfokanriControllerTest,testDeleteInfokanriNotFound,"存在しないID（例：9999）でDELETE /api/infokanri/{id}実行","HTTPステータス404 Not FoundまたはService層での処理により200 OK。適切なメッセージ返却",中,未実装,
+InfokanriControllerTest,testUpdateInfokanri,"PUT /api/infokanri/{id}で更新データ送信。Service.updateInfokanri()成功をMock設定","HTTPステータス200 OK。更新後のInfokanriデータをJSON形式で返却。全フィールドの更新確認",高,未実装,
+InfokanriControllerTest,testUpdateInfokanriNotFound,"存在しないIDでPUT /api/infokanri/{id}実行","HTTPステータス404 Not Found。エラーメッセージ「データが見つかりません」のJSONレスポンス",中,未実装,
+InfokanriControllerTest,testGetReport,"GET /api/infokanri/report実行。Service.getReportData()からデータ返却をMock設定","HTTPステータス200 OK。レポート用データの配列をJSON形式で返却。集計情報も含む",高,未実装,
+InfokanriControllerTest,testGetReportWithDateRange,"GET /api/infokanri/report?period=monthly&startDate=2025-07-01&endDate=2025-07-31実行","クエリパラメータが正しくServiceメソッドに渡される。期間指定されたレポートデータ返却",中,未実装,
+InfokanriControllerTest,testContentTypeHeaders,"各APIエンドポイントのレスポンスヘッダー確認","全レスポンスでContent-Type: application/json設定。文字エンコーディングUTF-8確認",低,未実装,
+InfokanriControllerTest,testErrorResponseFormat,"各種エラー状況でのレスポンスJSON形式統一確認","全エラーレスポンスが{""error"":"""", ""message"":"""", ""timestamp"":""""}形式。一貫性確保",中,未実装,
+GlobalExceptionHandlerTest,testHandleGenericException,"一般的なException（例：IllegalArgumentException）を意図的に発生させ、@ExceptionHandlerの動作確認","HTTPステータス500 Internal Server Error。JSON形式エラーレスポンス{""error"":""内部サーバーエラーが発生しました"", ""message"":例外メッセージ, ""timestamp"":ISO形式時刻, ""status"":500}",高,未実装,例外処理中核
+GlobalExceptionHandlerTest,testHandleRuntimeException,"RuntimeExceptionを意図的に発生させ、専用ハンドラーの動作確認","HTTPステータス500。JSON形式で{""error"":""処理中にエラーが発生しました"", ""message"":実際の例外メッセージ, ""timestamp"":現在時刻, ""status"":500}",高,未実装,
+GlobalExceptionHandlerTest,testExceptionResponseFormat,"複数の例外タイプでレスポンスJSON形式の一貫性確認","全例外で同一のJSON構造。必須フィールド（error, message, timestamp, status）の存在確認。型の一致確認",中,未実装,
+GlobalExceptionHandlerTest,testExceptionTimestamp,"例外発生時のタイムスタンプフィールド詳細確認","timestampフィールドがISO8601形式（yyyy-MM-ddTHH:mm:ss）で設定。例外発生時刻との差が1秒以内",低,未実装,
+GlobalExceptionHandlerTest,testExceptionStatusCode,"各例外タイプに対する適切なHTTPステータスコード確認","Exception系は500 Internal Server Error。将来的に404、400等の実装時はそれぞれ適切なコード返却",中,未実装,
+GlobalExceptionHandlerTest,testExceptionLogging,"例外発生時のコンソール出力（System.err）確認","「=== グローバル例外キャッチ ===」メッセージ出力。例外タイプ、メッセージ、スタックトレースの出力確認",低,未実装,
+InfokanriIntegrationTest,testCompleteDataFlow,"@SpringBootTestで実データベース使用。データ登録（POST）→一覧取得（GET）→データ更新（PUT）→削除（DELETE）の完全CRUD操作フローを実際のHTTPリクエストで実行","全CRUD操作が正常に実行される。データベースの状態変化確認。各ステップでレスポンスコードとデータ内容の検証。最終的にデータが完全削除されている",最高,未実装,統合テスト最重要
+InfokanriIntegrationTest,testMultiUserData,"複数ユーザー（user1, user2, user3）のデータを混在保存し、X-User-Idヘッダーでのデータ分離動作確認","各ユーザーが自分のデータのみ参照可能。他ユーザーのデータは取得されない。ユーザー間のデータ漏洩なし",高,未実装,
+InfokanriIntegrationTest,testConcurrentAccess,"複数スレッド（5スレッド）で同時にデータ登録・更新処理実行","データの整合性保持。スレッド間での競合状態なし。全データが正しく保存される。ロック機構の動作確認",中,未実装,
+InfokanriIntegrationTest,testDatabaseTransaction,"データ更新中に意図的に例外発生させてトランザクション動作確認","例外発生時にデータベース変更がロールバックされる。部分的な更新が残らない。データの一貫性保持",高,未実装,
+InfokanriIntegrationTest,testErrorRecovery,"データベース接続エラー後の自動復旧、再試行機能の動作確認","エラー発生後に接続復旧。再試行ロジックが正常動作。アプリケーションが継続稼働する",中,未実装,
+InfokanriIntegrationTest,testDataConsistency,"大量データ（1000件）登録後の集計処理、データ整合性確認","登録データ数と取得データ数の一致。集計値（合計金額等）の正確性。インデックスの効果確認",高,未実装,

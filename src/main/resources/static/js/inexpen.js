@@ -182,10 +182,10 @@ document.getElementById('expenseForm').addEventListener('submit', async function
     try {
       // リクエストペイロードを作成
       const payload = {
-        hiduke: date,
-        syubetu: incomeOrExpenditure === 'income' ? '収入' : '支出',
-        naisyo: category,
-        kingaku: parseInt(amount, 10),
+        registed_at: date,
+        type: incomeOrExpenditure === 'income' ? '収入' : '支出',
+        category: category,
+        amount: parseInt(amount, 10),
       };
       console.log('送信するデータ:', payload); // 送信するデータをログに出力
 

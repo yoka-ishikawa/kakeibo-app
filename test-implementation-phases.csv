@@ -1,0 +1,10 @@
+フェーズ,タスク,対象ファイル,優先度,推定工数（時間）,実装状況,完了予定日
+Phase 1,Model層テスト実装,InfokanriTest.java,高,4,未実装,
+Phase 1,Repository層テスト実装,InfokanriRepositoryTest.java,高,6,未実装,
+Phase 1,Service層テスト実装,InfokanriServiceTest.java,最高,8,未実装,
+Phase 2,Controller層テスト実装,InfokanriControllerTest.java,高,10,未実装,
+Phase 2,Exception Handler テスト実装,GlobalExceptionHandlerTest.java,高,4,未実装,
+Phase 3,統合テスト実装,InfokanriIntegrationTest.java,最高,12,未実装,
+Phase 4,テストカバレッジ確認,-,中,2,未実装,
+Phase 4,継続的インテグレーション設定,-,中,4,未実装,
+Phase 4,テスト実行自動化,-,低,2,未実装,

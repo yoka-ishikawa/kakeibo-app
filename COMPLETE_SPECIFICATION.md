@@ -201,18 +201,18 @@ const expenditureCategories = [
 CREATE TABLE IF NOT EXISTS tb_info_kanri (
     id SERIAL PRIMARY KEY,                          -- 主キー
     user_id VARCHAR(255),                           -- ユーザーID
-    syubetu VARCHAR(50) NOT NULL,                   -- 収支種別
-    kingaku INTEGER NOT NULL,                       -- 金額
-    naisyo VARCHAR(255),                            -- 内容・カテゴリ
-    hiduke DATE NOT NULL,                           -- 日付
+    type VARCHAR(50) NOT NULL,                   -- 収支種別
+    amount INTEGER NOT NULL,                       -- 金額
+    category VARCHAR(255),                            -- 内容・カテゴリ
+    registed_at DATE NOT NULL,                           -- 日付
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- パフォーマンス最適化インデックス
 CREATE INDEX IF NOT EXISTS idx_tb_info_kanri_user_id ON tb_info_kanri(user_id);
-CREATE INDEX IF NOT EXISTS idx_tb_info_kanri_hiduke ON tb_info_kanri(hiduke);
-CREATE INDEX IF NOT EXISTS idx_tb_info_kanri_syubetu ON tb_info_kanri(syubetu);
+CREATE INDEX IF NOT EXISTS idx_tb_info_kanri_registed_at ON tb_info_kanri(registed_at);
+CREATE INDEX IF NOT EXISTS idx_tb_info_kanri_type ON tb_info_kanri(type);
 ```
 
 ### フィールド仕様
@@ -221,16 +221,16 @@ CREATE INDEX IF NOT EXISTS idx_tb_info_kanri_syubetu ON tb_info_kanri(syubetu);
 |-----------|-----|-----|------|
 | id | SERIAL | PRIMARY KEY | 自動増分主キー |
 | user_id | VARCHAR(255) | - | ユーザー識別子 |
-| syubetu | VARCHAR(50) | NOT NULL | 収支種別（"収入"/"支出"） |
-| kingaku | INTEGER | NOT NULL | 金額（正の整数） |
-| naisyo | VARCHAR(255) | - | カテゴリ・備考 |
-| hiduke | DATE | NOT NULL | 取引日付 |
+| type | VARCHAR(50) | NOT NULL | 収支種別（"収入"/"支出"） |
+| amount | INTEGER | NOT NULL | 金額（正の整数） |
+| category | VARCHAR(255) | - | カテゴリ・備考 |
+| registed_at | DATE | NOT NULL | 取引日付 |
 | created_at | TIMESTAMP | DEFAULT NOW() | 作成日時 |
 | updated_at | TIMESTAMP | DEFAULT NOW() | 更新日時 |
 
 ### データ例
 ```sql
-INSERT INTO tb_info_kanri (user_id, syubetu, kingaku, naisyo, hiduke) VALUES
+INSERT INTO tb_info_kanri (user_id, type, amount, category, registed_at) VALUES
 ('user123', '収入', 300000, '給料', '2025-06-20'),
 ('user123', '支出', 15000, '食事', '2025-06-21'),
 ('user123', '支出', 3000, '日用品', '2025-06-22');
@@ -249,10 +249,10 @@ Content-Type: application/json
 X-User-Id: user123
 
 {
-  "hiduke": "2025-06-22",
-  "syubetu": "収入", 
-  "naisyo": "給料",
-  "kingaku": 300000
+  "registed_at": "2025-06-22",
+  "type": "収入", 
+  "category": "給料",
+  "amount": 300000
 }
 ```
 
@@ -261,10 +261,10 @@ X-User-Id: user123
 {
   "id": 1,
   "userId": "user123",
-  "hiduke": "2025-06-22",
-  "syubetu": "収入",
-  "naisyo": "給料", 
-  "kingaku": 300000,
+  "registed_at": "2025-06-22",
+  "type": "収入",
+  "category": "給料", 
+  "amount": 300000,
   "createdAt": "2025-06-22T10:30:00Z",
   "updatedAt": "2025-06-22T10:30:00Z"
 }
@@ -281,10 +281,10 @@ GET /api/infokanri
   {
     "id": 1,
     "userId": "user123",
-    "hiduke": "2025-06-22",
-    "syubetu": "収入",
-    "naisyo": "給料",
-    "kingaku": 300000,
+    "registed_at": "2025-06-22",
+    "type": "収入",
+    "category": "給料",
+    "amount": 300000,
     "createdAt": "2025-06-22T10:30:00Z",
     "updatedAt": "2025-06-22T10:30:00Z"
   }
@@ -298,10 +298,10 @@ Content-Type: application/json
 X-User-Id: user123
 
 {
-  "hiduke": "2025-06-22",
-  "syubetu": "支出",
-  "naisyo": "食事", 
-  "kingaku": 2000
+  "registed_at": "2025-06-22",
+  "type": "支出",
+  "category": "食事", 
+  "amount": 2000
 }
 ```
 
@@ -389,10 +389,10 @@ function renderTable(data) {
   const tbody = document.querySelector('tbody');
   tbody.innerHTML = data.map(item => `
     <tr data-id="${item.id}">
-      <td>${item.hiduke}</td>
-      <td>${item.syubetu}</td>
-      <td>${item.naisyo}</td>
-      <td>${formatCurrency(item.kingaku)}</td>
+      <td>${item.registedAt}</td>
+      <td>${item.type}</td>
+      <td>${item.category}</td>
+      <td>${formatCurrency(item.amount)}</td>
       <td>
         <button onclick="editItem(${item.id})">編集</button>
         <button onclick="deleteItem(${item.id})">削除</button>

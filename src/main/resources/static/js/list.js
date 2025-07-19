@@ -16,8 +16,8 @@ async function loadDataList() {
 
     // 登録年月日の昇順（古い順）でソート
     data.sort((a, b) => {
-      const dateA = new Date(a.hiduke);
-      const dateB = new Date(b.hiduke);
+      const dateA = new Date(a.registedAt);
+      const dateB = new Date(b.registedAt);
       return dateA - dateB;
     });
 
@@ -32,13 +32,13 @@ async function loadDataList() {
       const row = document.createElement('tr');
       row.dataset.id = item.id;
 
-      const typeText = item.syubetu;
-      const amountText = item.kingaku.toLocaleString() + '円';
+      const typeText = item.type;
+      const amountText = item.amount.toLocaleString() + '円';
 
       row.innerHTML = `
-        <td class="date-cell">${item.hiduke}</td>
+        <td class="date-cell">${item.registedAt}</td>
         <td class="type-cell">${typeText}</td>
-        <td class="category-cell">${item.naisyo}</td>
+        <td class="category-cell">${item.category}</td>
         <td class="amount-cell">${amountText}</td>
         <td>
           <div class="button-wrapper">

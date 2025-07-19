@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const nextMonth = new Date(parseInt(year), parseInt(month), 0);
         const lastDay = nextMonth.getDate();
         endDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
-
       } else if (periodType === 'yearly') {
         // 年間の場合: 年から期間を計算
         selectedYear = document.getElementById('startyear').value;
@@ -61,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const params = new URLSearchParams({
         period: periodType,
         startDate: startDate,
-        endDate: endDate
+        endDate: endDate,
       });
 
       // レポートデータを取得（期間指定付き）
@@ -71,13 +70,15 @@ document.addEventListener('DOMContentLoaded', function () {
       console.log('レスポンス詳細:', {
         status: response.status,
         statusText: response.statusText,
-        ok: response.ok
+        ok: response.ok,
       });
 
       if (!response.ok) {
         const errorText = await response.text();
         console.error('APIエラー詳細:', errorText);
-        throw new Error(`レポートデータ取得に失敗しました。ステータス: ${response.status}, エラー: ${errorText}`);
+        throw new Error(
+          `レポートデータ取得に失敗しました。ステータス: ${response.status}, エラー: ${errorText}`
+        );
       }
 
       const data = await response.json();
@@ -85,14 +86,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // 指定期間内のデータのみフィルタリング
       const filteredData = data.filter((item) => {
-        const itemDate = item.hiduke; // YYYY-MM-DD形式
+        const itemDate = item.registedAt; // YYYY-MM-DD形式
         return itemDate >= startDate && itemDate <= endDate;
       });
 
       // 登録年月日の昇順でソート（古い順）
       filteredData.sort((a, b) => {
-        const dateA = new Date(a.hiduke);
-        const dateB = new Date(b.hiduke);
+        const dateA = new Date(a.registedAt);
+        const dateB = new Date(b.registedAt);
         return dateA - dateB;
       });
 
@@ -103,10 +104,10 @@ document.addEventListener('DOMContentLoaded', function () {
       let totalIncome = 0;
       let totalExpenditure = 0;
       filteredData.forEach((item) => {
-        if (item.syubetu === '収入') {
-          totalIncome += item.kingaku;
-        } else if (item.syubetu === '支出') {
-          totalExpenditure += item.kingaku;
+        if (item.type === '収入') {
+          totalIncome += item.amount;
+        } else if (item.type === '支出') {
+          totalExpenditure += item.amount;
         }
       });
 
@@ -143,13 +144,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
       filteredData.forEach((item) => {
         const row = document.createElement('tr');
-        const typeText = item.syubetu;
-        const amountText = item.kingaku.toLocaleString() + '円';
+        const typeText = item.type;
+        const amountText = item.amount.toLocaleString() + '円';
 
         row.innerHTML = `
-          <td>${item.hiduke}</td>
+          <td>${item.registedAt}</td>
           <td>${typeText}</td>
-          <td>${item.naisyo}</td>
+          <td>${item.category}</td>
           <td>${amountText}</td>
         `;
 
@@ -157,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
 
       console.log(`レポート表示完了: ${periodType}期間, ${filteredData.length}件のデータ`);
-
     } catch (error) {
       console.error('レポートデータ取得エラー:', error);
       alert('レポートデータの取得に失敗しました。');

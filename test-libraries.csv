@@ -1,0 +1,11 @@
+カテゴリ,ライブラリ名,バージョン,用途,使用箇所,必須/オプション
+テストフレームワーク,JUnit 5,5.9.x,基本テストフレームワーク,全テストクラス,必須
+モック,Mockito,4.x,モックオブジェクト作成,Service・Controller層テスト,必須
+アサーション,AssertJ,3.x,流暢なアサーション,全テストクラス,必須
+マッチャー,Hamcrest,2.x,マッチャーライブラリ,複雑な条件確認,オプション
+Spring Test,@SpringBootTest,-,全レイヤー統合テスト,InfokanriIntegrationTest,必須
+Spring Test,@WebMvcTest,-,Web層のみテスト,InfokanriControllerTest,必須
+Spring Test,@DataJpaTest,-,JPA Repository テスト,InfokanriRepositoryTest,必須
+Spring Test,@ExtendWith(MockitoExtension.class),-,Mockito統合,InfokanriServiceTest,必須
+データベース,TestContainers,1.x,実データベースでのテスト,統合テスト,オプション
+外部API,WireMock,2.x,外部API モック,将来的な外部連携テスト,オプション
