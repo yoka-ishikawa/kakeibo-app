@@ -41,7 +41,7 @@ public class SupabaseDataSourceConfig {
         String password = env.getProperty("DB_PASSWORD");
         
         logger.info("=== Supabase DataSource設定デバッグ開始 ===");
-        logger.info("DATABASE_URL環境変数: {}", maskPassword(rawDatabaseUrl));
+        logger.info("DATABASE_URL環境変数: {}", rawDatabaseUrl != null ? rawDatabaseUrl.replaceAll("://[^:]+:[^@]+@", "://***:***@") : "[null]");
         logger.info("DB_USERNAME環境変数: {}", username);
         logger.info("DB_PASSWORD設定: {}", password != null ? "[設定済み]" : "[未設定]");
         
@@ -60,7 +60,8 @@ public class SupabaseDataSourceConfig {
         // PostgreSQL URLをJDBC形式に変換
         String jdbcUrl = convertToJdbcUrl(rawDatabaseUrl);
         
-        logger.info("変換後JDBC URL: {}", maskPassword(jdbcUrl));
+        logger.info("変換後JDBC URL: {}", jdbcUrl != null ? jdbcUrl.replaceAll("://[^:]+:[^@]+@", "://***:***@") : "[null]");
+        logger.info("実際のURL値（デバッグ用）: {}", rawDatabaseUrl);
         
         // HikariCP設定
         HikariConfig config = new HikariConfig();
