@@ -74,11 +74,11 @@ DB_PASSWORD=[YOUR-PASSWORD]
 
 ### **Phase 6: デプロイとテスト**
 
-#### ✅ **Step 7: アプリケーションデプロイ**
-1. GitHubに変更をコミット&プッシュ
-2. Renderで自動デプロイ実行確認
-3. デプロイログで「production-supabase」プロファイル使用確認
-4. エラーがないことを確認
+#### ✅ **Step 7: アプリケーションデプロイ** ✅ **完了**
+1. ✅ GitHubに変更をコミット&プッシュ
+2. ✅ Renderで自動デプロイ実行確認
+3. ✅ デプロイログで「production-supabase」プロファイル使用確認
+4. ✅ エラーがないことを確認
 
 #### ✅ **Step 8: 動作確認**  
 1. https://kakeibo-app-gy0m.onrender.com にアクセス
